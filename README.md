@@ -1,2 +1,2 @@
-# Gesti-n-Hotel
+# Gestion-Hotel
 Proyecto Final Desarrollo de Software IV
