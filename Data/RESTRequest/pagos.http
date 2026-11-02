@@ -1,0 +1,184 @@
+@host = http://localhost:8080/api
+@uri = {{host}}/pagos
+
+### Pago SINPE de la reserva de habitación de Laura
+POST {{uri}}
+Content-Type: application/json
+
+{
+    "reserva_habitacion_id": 1,
+    "registrado_por": 2,
+    "monto": 240000,
+    "metodo": "SINPE",
+    "referencia": "2026112400458123",
+    "pagado_at": "2026-11-24 10:15:00"
+}
+
+### Pago en efectivo de la reserva de tour de Laura
+POST {{uri}}
+Content-Type: application/json
+
+{
+    "reserva_tour_id": 1,
+    "registrado_por": 2,
+    "monto": 100000,
+    "metodo": "EFECTIVO",
+    "pagado_at": "2026-12-19 07:30:00"
+}
+
+### Pago con tarjeta de la reserva de Carlos
+POST {{uri}}
+Content-Type: application/json
+
+{
+    "reserva_habitacion_id": 2,
+    "registrado_por": 2,
+    "monto": 105000,
+    "metodo": "TARJETA",
+    "referencia": "AUT-482913",
+    "pagado_at": "2026-12-21 15:00:00"
+}
+
+### Pago temporal en dólares y en efectivo sin referencia (se elimina al final)
+POST {{uri}}
+Content-Type: application/json
+
+{
+    "reserva_tour_id": 2,
+    "registrado_por": 2,
+    "monto": 150,
+    "moneda": "USD",
+    "metodo": "EFECTIVO",
+    "pagado_at": "2026-12-20 08:30:00"
+}
+
+### Insertar con datos inválidos (422)
+POST {{uri}}
+Content-Type: application/json
+
+{
+    "registrado_por": "",
+    "monto": 0,
+    "metodo": "",
+    "pagado_at": ""
+}
+
+### Insertar sin ninguna reserva (422)
+POST {{uri}}
+Content-Type: application/json
+
+{
+    "registrado_por": 2,
+    "monto": 5000,
+    "metodo": "EFECTIVO",
+    "pagado_at": "2026-12-20 10:00:00"
+}
+
+### Insertar con las dos reservas a la vez (422)
+POST {{uri}}
+Content-Type: application/json
+
+{
+    "reserva_habitacion_id": 1,
+    "reserva_tour_id": 1,
+    "registrado_por": 2,
+    "monto": 5000,
+    "metodo": "EFECTIVO",
+    "pagado_at": "2026-12-20 10:00:00"
+}
+
+### Insertar con una moneda no permitida (422)
+POST {{uri}}
+Content-Type: application/json
+
+{
+    "reserva_habitacion_id": 1,
+    "registrado_por": 2,
+    "monto": 100,
+    "moneda": "EUR",
+    "metodo": "TARJETA",
+    "referencia": "AUT-000001",
+    "pagado_at": "2026-12-20 10:00:00"
+}
+
+### Insertar con un método que no existe (422)
+POST {{uri}}
+Content-Type: application/json
+
+{
+    "reserva_habitacion_id": 1,
+    "registrado_por": 2,
+    "monto": 5000,
+    "metodo": "CHEQUE",
+    "pagado_at": "2026-12-20 10:00:00"
+}
+
+### Insertar con una reserva que no existe (422)
+POST {{uri}}
+Content-Type: application/json
+
+{
+    "reserva_habitacion_id": 9999,
+    "registrado_por": 2,
+    "monto": 5000,
+    "metodo": "EFECTIVO",
+    "pagado_at": "2026-12-20 10:00:00"
+}
+
+### Insertar con una fecha que no existe (422)
+POST {{uri}}
+Content-Type: application/json
+
+{
+    "reserva_habitacion_id": 1,
+    "registrado_por": 2,
+    "monto": 5000,
+    "metodo": "EFECTIVO",
+    "pagado_at": "2026-12-32 10:00:00"
+}
+
+### Insertar SINPE con referencia repetida (409)
+POST {{uri}}
+Content-Type: application/json
+
+{
+    "reserva_habitacion_id": 2,
+    "registrado_por": 2,
+    "monto": 5000,
+    "metodo": "SINPE",
+    "referencia": "2026112400458123",
+    "pagado_at": "2026-12-20 10:00:00"
+}
+
+### Listar todos los pagos
+GET {{uri}}
+
+### Obtener pago por id
+GET {{uri}}/1
+
+### Pago que no existe (404)
+GET {{uri}}/9999
+
+### Corregir la referencia del pago con tarjeta
+PUT {{uri}}/3
+Content-Type: application/json
+
+{
+    "referencia": "AUT-482914"
+}
+
+### Actualizar con monto negativo (422)
+PUT {{uri}}/3
+Content-Type: application/json
+
+{
+    "monto": -100
+}
+
+### Eliminar pago temporal
+DELETE {{uri}}/4
+
+### Eliminar una reserva de habitación que tiene pagos (409)
+DELETE {{host}}/reservas-habitacion/1
+
+###

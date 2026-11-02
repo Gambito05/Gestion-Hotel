@@ -1,0 +1,124 @@
+@host = http://localhost:8080/api
+@uri = {{host}}/tipos-habitacion
+
+### Insertar tipo Estándar
+POST {{uri}}
+Content-Type: application/json
+
+{
+    "nombre": "Estándar",
+    "descripcion": "Habitación con cama matrimonial",
+    "capacidad": 2,
+    "precio_noche": 35000
+}
+
+### Insertar tipo Suite
+POST {{uri}}
+Content-Type: application/json
+
+{
+    "nombre": "Suite",
+    "descripcion": "Suite con jacuzzi y vista al mar",
+    "capacidad": 3,
+    "precio_noche": 80000
+}
+
+### Insertar tipo Familiar
+POST {{uri}}
+Content-Type: application/json
+
+{
+    "nombre": "Familiar",
+    "descripcion": "Dos cuartos y cocineta",
+    "capacidad": 5,
+    "precio_noche": 60000
+}
+
+### Insertar tipo temporal (se elimina al final)
+POST {{uri}}
+Content-Type: application/json
+
+{
+    "nombre": "Temporal",
+    "capacidad": 1,
+    "precio_noche": 10000
+}
+
+### Insertar con capacidad 0 (422)
+POST {{uri}}
+Content-Type: application/json
+
+{
+    "nombre": "Mini",
+    "capacidad": 0,
+    "precio_noche": 20000
+}
+
+### Insertar con precio negativo (422)
+POST {{uri}}
+Content-Type: application/json
+
+{
+    "nombre": "Mini",
+    "capacidad": 1,
+    "precio_noche": -10
+}
+
+### Insertar con activo distinto de 0 o 1 (422)
+POST {{uri}}
+Content-Type: application/json
+
+{
+    "nombre": "Mini",
+    "capacidad": 1,
+    "precio_noche": 20000,
+    "activo": 2
+}
+
+### Insertar con nombre repetido (409)
+POST {{uri}}
+Content-Type: application/json
+
+{
+    "nombre": "Suite",
+    "capacidad": 2,
+    "precio_noche": 70000
+}
+
+### Listar todos los tipos de habitación
+GET {{uri}}
+
+### Obtener tipo por id
+GET {{uri}}/2
+
+### Tipo que no existe (404)
+GET {{uri}}/9999
+
+### Actualizar precio por noche
+PUT {{uri}}/2
+Content-Type: application/json
+
+{
+    "precio_noche": 85000
+}
+
+### Actualizar con capacidad 0 (422)
+PUT {{uri}}/2
+Content-Type: application/json
+
+{
+    "capacidad": 0
+}
+
+### Desactivar tipo (borrado lógico)
+PUT {{uri}}/4
+Content-Type: application/json
+
+{
+    "activo": 0
+}
+
+### Eliminar tipo temporal
+DELETE {{uri}}/4
+
+###

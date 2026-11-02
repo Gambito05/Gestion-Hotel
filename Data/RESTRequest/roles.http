@@ -1,0 +1,107 @@
+@host = http://localhost:8080/api
+@uri = {{host}}/roles
+
+### Insertar rol ADMIN
+POST {{uri}}
+Content-Type: application/json
+
+{
+    "nombre": "ADMIN"
+}
+
+### Insertar rol RECEPCIONISTA
+POST {{uri}}
+Content-Type: application/json
+
+{
+    "nombre": "RECEPCIONISTA"
+}
+
+### Insertar rol CLIENTE
+POST {{uri}}
+Content-Type: application/json
+
+{
+    "nombre": "CLIENTE"
+}
+
+### Insertar rol temporal (se elimina al final)
+POST {{uri}}
+Content-Type: application/json
+
+{
+    "nombre": "TEMPORAL"
+}
+
+### Insertar con nombre vacío (422)
+POST {{uri}}
+Content-Type: application/json
+
+{
+    "nombre": ""
+}
+
+### Insertar con nombre de más de 30 caracteres (422)
+POST {{uri}}
+Content-Type: application/json
+
+{
+    "nombre": "ROL CON UN NOMBRE DEMASIADO LARGO PARA LA COLUMNA"
+}
+
+### Insertar rol repetido (409)
+POST {{uri}}
+Content-Type: application/json
+
+{
+    "nombre": "ADMIN"
+}
+
+### Listar todos los roles
+GET {{uri}}
+
+### Obtener rol por id
+GET {{uri}}/1
+
+### Rol que no existe (404)
+GET {{uri}}/9999
+
+### Actualizar nombre del rol temporal
+PUT {{uri}}/4
+Content-Type: application/json
+
+{
+    "nombre": "TEMPORAL EDITADO"
+}
+
+### Actualizar con nombre vacío (422)
+PUT {{uri}}/4
+Content-Type: application/json
+
+{
+    "nombre": ""
+}
+
+### Actualizar a un nombre que ya existe (409)
+PUT {{uri}}/4
+Content-Type: application/json
+
+{
+    "nombre": "ADMIN"
+}
+
+### Actualizar rol que no existe (404)
+PUT {{uri}}/9999
+Content-Type: application/json
+
+{
+    "nombre": "OTRO"
+}
+
+### Eliminar rol temporal
+DELETE {{uri}}/4
+
+### Eliminar rol que no existe (404)
+DELETE {{uri}}/9999
+
+###

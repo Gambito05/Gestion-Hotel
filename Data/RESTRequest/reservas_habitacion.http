@@ -1,0 +1,193 @@
+@host = http://localhost:8080/api
+@uri = {{host}}/reservas-habitacion
+
+### Reserva de Laura desde la app (Suite 201)
+POST {{uri}}
+Content-Type: application/json
+
+{
+    "codigo": "RH-0001",
+    "cliente_id": 3,
+    "habitacion_id": 3,
+    "fecha_entrada": "2026-12-20",
+    "fecha_salida": "2026-12-23",
+    "huespedes": 2,
+    "precio_noche": 80000,
+    "total": 240000
+}
+
+### Reserva de Carlos registrada en recepción (101)
+POST {{uri}}
+Content-Type: application/json
+
+{
+    "codigo": "RH-0002",
+    "cliente_id": 4,
+    "habitacion_id": 1,
+    "registrada_por": 2,
+    "fecha_entrada": "2026-12-21",
+    "fecha_salida": "2026-12-24",
+    "huespedes": 2,
+    "precio_noche": 35000,
+    "total": 105000,
+    "estado": "CONFIRMADA"
+}
+
+### Reserva temporal (se elimina al final)
+POST {{uri}}
+Content-Type: application/json
+
+{
+    "codigo": "RH-0003",
+    "cliente_id": 4,
+    "habitacion_id": 4,
+    "fecha_entrada": "2027-01-05",
+    "fecha_salida": "2027-01-07",
+    "huespedes": 4,
+    "precio_noche": 60000,
+    "total": 120000
+}
+
+### Insertar con datos inválidos (422)
+POST {{uri}}
+Content-Type: application/json
+
+{
+    "codigo": "",
+    "cliente_id": "",
+    "habitacion_id": "",
+    "fecha_entrada": "",
+    "fecha_salida": "",
+    "huespedes": 0,
+    "precio_noche": -1,
+    "total": "abc"
+}
+
+### Insertar con fecha de salida antes de la entrada (422)
+POST {{uri}}
+Content-Type: application/json
+
+{
+    "codigo": "RH-0010",
+    "cliente_id": 3,
+    "habitacion_id": 2,
+    "fecha_entrada": "2026-12-23",
+    "fecha_salida": "2026-12-20",
+    "huespedes": 2,
+    "precio_noche": 35000,
+    "total": 105000
+}
+
+### Insertar con una fecha que no existe (422)
+POST {{uri}}
+Content-Type: application/json
+
+{
+    "codigo": "RH-0010",
+    "cliente_id": 3,
+    "habitacion_id": 2,
+    "fecha_entrada": "2026-02-30",
+    "fecha_salida": "2026-03-02",
+    "huespedes": 2,
+    "precio_noche": 35000,
+    "total": 70000
+}
+
+### Insertar con un estado que no existe (422)
+POST {{uri}}
+Content-Type: application/json
+
+{
+    "codigo": "RH-0010",
+    "cliente_id": 3,
+    "habitacion_id": 2,
+    "fecha_entrada": "2026-12-26",
+    "fecha_salida": "2026-12-28",
+    "huespedes": 2,
+    "precio_noche": 35000,
+    "total": 70000,
+    "estado": "RESERVADA"
+}
+
+### Insertar con un cliente que no existe (422)
+POST {{uri}}
+Content-Type: application/json
+
+{
+    "codigo": "RH-0010",
+    "cliente_id": 9999,
+    "habitacion_id": 2,
+    "fecha_entrada": "2026-12-26",
+    "fecha_salida": "2026-12-28",
+    "huespedes": 2,
+    "precio_noche": 35000,
+    "total": 70000
+}
+
+### Insertar con código repetido (409)
+POST {{uri}}
+Content-Type: application/json
+
+{
+    "codigo": "RH-0001",
+    "cliente_id": 3,
+    "habitacion_id": 2,
+    "fecha_entrada": "2026-12-26",
+    "fecha_salida": "2026-12-28",
+    "huespedes": 2,
+    "precio_noche": 35000,
+    "total": 70000
+}
+
+### Listar todas las reservas de habitación
+GET {{uri}}
+
+### Obtener reserva por id
+GET {{uri}}/1
+
+### Reserva que no existe (404)
+GET {{uri}}/9999
+
+### Confirmar reserva de Laura
+PUT {{uri}}/1
+Content-Type: application/json
+
+{
+    "estado": "CONFIRMADA"
+}
+
+### Hacer check-in de Laura
+PUT {{uri}}/1
+Content-Type: application/json
+
+{
+    "estado": "EN_CURSO",
+    "checkin_at": "2026-12-20 14:30:00"
+}
+
+### Actualizar con fecha de salida antes de la entrada (422)
+PUT {{uri}}/2
+Content-Type: application/json
+
+{
+    "fecha_salida": "2026-12-20"
+}
+
+### Actualizar con un estado que no existe (422)
+PUT {{uri}}/2
+Content-Type: application/json
+
+{
+    "estado": "PAGADA"
+}
+
+### Eliminar reserva temporal
+DELETE {{uri}}/3
+
+### Eliminar una habitación que tiene reservas (409)
+DELETE {{host}}/habitaciones/3
+
+### Eliminar un cliente que tiene reservas (409)
+DELETE {{host}}/usuarios/3
+
+###

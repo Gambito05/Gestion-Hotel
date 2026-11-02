@@ -1,0 +1,84 @@
+@host = http://localhost:8080/api
+@uri = {{host}}/guias
+
+### Insertar guía Carlos
+POST {{uri}}
+Content-Type: application/json
+
+{
+    "nombre": "Carlos Mora",
+    "telefono": "8777-1111"
+}
+
+### Insertar guía Ana
+POST {{uri}}
+Content-Type: application/json
+
+{
+    "nombre": "Ana Jiménez",
+    "telefono": "8777-2222"
+}
+
+### Insertar guía temporal (se elimina al final)
+POST {{uri}}
+Content-Type: application/json
+
+{
+    "nombre": "Guía Temporal"
+}
+
+### Insertar con nombre vacío (422)
+POST {{uri}}
+Content-Type: application/json
+
+{
+    "nombre": ""
+}
+
+### Insertar con teléfono de más de 20 caracteres (422)
+POST {{uri}}
+Content-Type: application/json
+
+{
+    "nombre": "Pedro",
+    "telefono": "8777-3333 ext. 123456789"
+}
+
+### Insertar con activo distinto de 0 o 1 (422)
+POST {{uri}}
+Content-Type: application/json
+
+{
+    "nombre": "Pedro",
+    "activo": 3
+}
+
+### Listar todos los guías
+GET {{uri}}
+
+### Obtener guía por id
+GET {{uri}}/1
+
+### Guía que no existe (404)
+GET {{uri}}/9999
+
+### Actualizar teléfono
+PUT {{uri}}/2
+Content-Type: application/json
+
+{
+    "telefono": "8777-9999"
+}
+
+### Actualizar con nombre vacío (422)
+PUT {{uri}}/2
+Content-Type: application/json
+
+{
+    "nombre": ""
+}
+
+### Eliminar guía temporal
+DELETE {{uri}}/3
+
+###

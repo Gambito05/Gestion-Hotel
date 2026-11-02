@@ -1,0 +1,143 @@
+@host = http://localhost:8080/api
+@uri = {{host}}/habitaciones
+
+### Insertar habitación 101 (Estándar)
+POST {{uri}}
+Content-Type: application/json
+
+{
+    "tipo_habitacion_id": 1,
+    "numero": "101",
+    "piso": 1
+}
+
+### Insertar habitación 102 (Estándar)
+POST {{uri}}
+Content-Type: application/json
+
+{
+    "tipo_habitacion_id": 1,
+    "numero": "102",
+    "piso": 1
+}
+
+### Insertar habitación 201 (Suite)
+POST {{uri}}
+Content-Type: application/json
+
+{
+    "tipo_habitacion_id": 2,
+    "numero": "201",
+    "piso": 2
+}
+
+### Insertar habitación 202 (Familiar)
+POST {{uri}}
+Content-Type: application/json
+
+{
+    "tipo_habitacion_id": 3,
+    "numero": "202",
+    "piso": 2
+}
+
+### Insertar habitación temporal (se elimina al final)
+POST {{uri}}
+Content-Type: application/json
+
+{
+    "tipo_habitacion_id": 2,
+    "numero": "999",
+    "piso": 9,
+    "estado": "FUERA_SERVICIO"
+}
+
+### Insertar con datos inválidos (422)
+POST {{uri}}
+Content-Type: application/json
+
+{
+    "tipo_habitacion_id": "",
+    "numero": "",
+    "piso": "dos"
+}
+
+### Insertar con un estado que no existe (422)
+POST {{uri}}
+Content-Type: application/json
+
+{
+    "tipo_habitacion_id": 1,
+    "numero": "103",
+    "piso": 1,
+    "estado": "OCUPADA"
+}
+
+### Insertar con un tipo que no existe (422)
+POST {{uri}}
+Content-Type: application/json
+
+{
+    "tipo_habitacion_id": 9999,
+    "numero": "103",
+    "piso": 1
+}
+
+### Insertar con número repetido (409)
+POST {{uri}}
+Content-Type: application/json
+
+{
+    "tipo_habitacion_id": 1,
+    "numero": "101",
+    "piso": 1
+}
+
+### Listar todas las habitaciones
+GET {{uri}}
+
+### Obtener habitación por id
+GET {{uri}}/3
+
+### Habitación que no existe (404)
+GET {{uri}}/9999
+
+### Poner habitación en mantenimiento
+PUT {{uri}}/2
+Content-Type: application/json
+
+{
+    "estado": "MANTENIMIENTO"
+}
+
+### Volver a dejarla disponible
+PUT {{uri}}/2
+Content-Type: application/json
+
+{
+    "estado": "DISPONIBLE"
+}
+
+### Actualizar con un estado que no existe (422)
+PUT {{uri}}/2
+Content-Type: application/json
+
+{
+    "estado": "LIMPIEZA"
+}
+
+### Actualizar a un número que ya existe (409)
+PUT {{uri}}/2
+Content-Type: application/json
+
+{
+    "numero": "101"
+}
+
+### Eliminar habitación temporal
+DELETE {{uri}}/5
+
+### Eliminar un tipo de habitación que tiene habitaciones (409)
+DELETE {{host}}/tipos-habitacion/1
+
+###

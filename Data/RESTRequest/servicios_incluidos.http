@@ -1,0 +1,106 @@
+@host = http://localhost:8080/api
+@uri = {{host}}/servicios-incluidos
+
+### Estándar incluye Wi-Fi
+POST {{uri}}
+Content-Type: application/json
+
+{
+    "tipo_habitacion_id": 1,
+    "servicio_habitacion_id": 1
+}
+
+### Estándar incluye Aire acondicionado
+POST {{uri}}
+Content-Type: application/json
+
+{
+    "tipo_habitacion_id": 1,
+    "servicio_habitacion_id": 2
+}
+
+### Suite incluye Wi-Fi
+POST {{uri}}
+Content-Type: application/json
+
+{
+    "tipo_habitacion_id": 2,
+    "servicio_habitacion_id": 1
+}
+
+### Suite incluye Aire acondicionado
+POST {{uri}}
+Content-Type: application/json
+
+{
+    "tipo_habitacion_id": 2,
+    "servicio_habitacion_id": 2
+}
+
+### Suite incluye Jacuzzi
+POST {{uri}}
+Content-Type: application/json
+
+{
+    "tipo_habitacion_id": 2,
+    "servicio_habitacion_id": 3
+}
+
+### Suite incluye Vista al mar
+POST {{uri}}
+Content-Type: application/json
+
+{
+    "tipo_habitacion_id": 2,
+    "servicio_habitacion_id": 4
+}
+
+### Familiar incluye Wi-Fi
+POST {{uri}}
+Content-Type: application/json
+
+{
+    "tipo_habitacion_id": 3,
+    "servicio_habitacion_id": 1
+}
+
+### Familiar incluye Cocineta
+POST {{uri}}
+Content-Type: application/json
+
+{
+    "tipo_habitacion_id": 3,
+    "servicio_habitacion_id": 5
+}
+
+### Insertar con ids no numéricos (422)
+POST {{uri}}
+Content-Type: application/json
+
+{
+    "tipo_habitacion_id": "abc",
+    "servicio_habitacion_id": ""
+}
+
+### Insertar pareja repetida (409)
+POST {{uri}}
+Content-Type: application/json
+
+{
+    "tipo_habitacion_id": 2,
+    "servicio_habitacion_id": 3
+}
+
+### Insertar con un servicio que no existe (422)
+POST {{uri}}
+Content-Type: application/json
+
+{
+    "tipo_habitacion_id": 1,
+    "servicio_habitacion_id": 9999
+}
+
+### Listar todos los servicios incluidos
+GET {{uri}}
+
+###

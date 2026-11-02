@@ -1,0 +1,70 @@
+@host = http://localhost:8080/api
+@uri = {{host}}/idiomas-guia
+
+### Carlos habla Español
+POST {{uri}}
+Content-Type: application/json
+
+{
+    "guia_id": 1,
+    "idioma_id": 1
+}
+
+### Carlos habla Inglés
+POST {{uri}}
+Content-Type: application/json
+
+{
+    "guia_id": 1,
+    "idioma_id": 2
+}
+
+### Ana habla Español
+POST {{uri}}
+Content-Type: application/json
+
+{
+    "guia_id": 2,
+    "idioma_id": 1
+}
+
+### Ana habla Francés
+POST {{uri}}
+Content-Type: application/json
+
+{
+    "guia_id": 2,
+    "idioma_id": 3
+}
+
+### Insertar con ids vacíos (422)
+POST {{uri}}
+Content-Type: application/json
+
+{
+    "guia_id": "",
+    "idioma_id": ""
+}
+
+### Insertar pareja repetida (409)
+POST {{uri}}
+Content-Type: application/json
+
+{
+    "guia_id": 1,
+    "idioma_id": 2
+}
+
+### Insertar con un idioma que no existe (422)
+POST {{uri}}
+Content-Type: application/json
+
+{
+    "guia_id": 1,
+    "idioma_id": 9999
+}
+
+### Listar idiomas de los guías
+GET {{uri}}
+
+###

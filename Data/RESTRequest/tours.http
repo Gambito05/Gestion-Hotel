@@ -1,0 +1,120 @@
+@host = http://localhost:8080/api
+@uri = {{host}}/tours
+
+### Insertar tour Volcán Arenal
+POST {{uri}}
+Content-Type: application/json
+
+{
+    "nombre": "Volcán Arenal",
+    "descripcion": "Caminata por los senderos del volcán",
+    "duracion_horas": 4.5,
+    "precio_persona": 25000,
+    "cupo_maximo": 15,
+    "punto_encuentro": "Frente a la iglesia de La Fortuna",
+    "latitud": 10.471,
+    "longitud": -84.645
+}
+
+### Insertar tour Canopy
+POST {{uri}}
+Content-Type: application/json
+
+{
+    "nombre": "Canopy",
+    "duracion_horas": 3,
+    "precio_persona": 35000,
+    "cupo_maximo": 10,
+    "punto_encuentro": "Recepción del hotel"
+}
+
+### Insertar tour Aguas termales
+POST {{uri}}
+Content-Type: application/json
+
+{
+    "nombre": "Aguas termales",
+    "duracion_horas": 2.5,
+    "precio_persona": 20000,
+    "cupo_maximo": 20,
+    "punto_encuentro": "Recepción del hotel",
+    "foto_url": "https://ejemplo.com/termales.jpg"
+}
+
+### Insertar tour temporal (se elimina al final)
+POST {{uri}}
+Content-Type: application/json
+
+{
+    "nombre": "Tour Temporal",
+    "duracion_horas": 1,
+    "precio_persona": 5000,
+    "cupo_maximo": 5,
+    "punto_encuentro": "Lobby"
+}
+
+### Insertar con datos inválidos (422)
+POST {{uri}}
+Content-Type: application/json
+
+{
+    "nombre": "",
+    "duracion_horas": 0,
+    "precio_persona": "abc",
+    "cupo_maximo": 0,
+    "punto_encuentro": ""
+}
+
+### Insertar con latitud fuera de rango (422)
+POST {{uri}}
+Content-Type: application/json
+
+{
+    "nombre": "Tour Polo",
+    "duracion_horas": 2,
+    "precio_persona": 10000,
+    "cupo_maximo": 5,
+    "punto_encuentro": "Lobby",
+    "latitud": 95,
+    "longitud": -84
+}
+
+### Listar todos los tours
+GET {{uri}}
+
+### Obtener tour por id
+GET {{uri}}/1
+
+### Tour que no existe (404)
+GET {{uri}}/9999
+
+### Actualizar precio y cupo
+PUT {{uri}}/2
+Content-Type: application/json
+
+{
+    "precio_persona": 38000,
+    "cupo_maximo": 12
+}
+
+### Agregar coordenadas
+PUT {{uri}}/2
+Content-Type: application/json
+
+{
+    "latitud": 10.468,
+    "longitud": -84.648
+}
+
+### Actualizar con longitud fuera de rango (422)
+PUT {{uri}}/2
+Content-Type: application/json
+
+{
+    "longitud": -200
+}
+
+### Eliminar tour temporal
+DELETE {{uri}}/4
+
+###

@@ -1,0 +1,96 @@
+@host = http://localhost:8080/api
+@uri = {{host}}/servicios-habitacion
+
+### Insertar servicio Wi-Fi
+POST {{uri}}
+Content-Type: application/json
+
+{
+    "nombre": "Wi-Fi"
+}
+
+### Insertar servicio Aire acondicionado
+POST {{uri}}
+Content-Type: application/json
+
+{
+    "nombre": "Aire acondicionado"
+}
+
+### Insertar servicio Jacuzzi
+POST {{uri}}
+Content-Type: application/json
+
+{
+    "nombre": "Jacuzzi"
+}
+
+### Insertar servicio Vista al mar
+POST {{uri}}
+Content-Type: application/json
+
+{
+    "nombre": "Vista al mar"
+}
+
+### Insertar servicio Cocineta
+POST {{uri}}
+Content-Type: application/json
+
+{
+    "nombre": "Cocineta"
+}
+
+### Insertar servicio temporal (se elimina al final)
+POST {{uri}}
+Content-Type: application/json
+
+{
+    "nombre": "Temporal"
+}
+
+### Insertar con nombre vacío (422)
+POST {{uri}}
+Content-Type: application/json
+
+{
+    "nombre": ""
+}
+
+### Insertar servicio repetido (409)
+POST {{uri}}
+Content-Type: application/json
+
+{
+    "nombre": "Jacuzzi"
+}
+
+### Insertar servicio repetido en minúsculas (409)
+POST {{uri}}
+Content-Type: application/json
+
+{
+    "nombre": "wi-fi"
+}
+
+### Listar todos los servicios
+GET {{uri}}
+
+### Obtener servicio por id
+GET {{uri}}/1
+
+### Servicio que no existe (404)
+GET {{uri}}/9999
+
+### Actualizar nombre
+PUT {{uri}}/6
+Content-Type: application/json
+
+{
+    "nombre": "Temporal editado"
+}
+
+### Eliminar servicio temporal
+DELETE {{uri}}/6
+
+###

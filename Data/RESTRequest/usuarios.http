@@ -1,0 +1,175 @@
+@host = http://localhost:8080/api
+@uri = {{host}}/usuarios
+
+### Insertar administrador
+POST {{uri}}
+Content-Type: application/json
+
+{
+    "rol_id": 1,
+    "nombre": "Kevin",
+    "apellidos": "Simpson Varela",
+    "email": "admin@hotel.com",
+    "password_hash": "$2y$10$q0ODEJXIzDy3J9Ck9LcOyuMJVf.Kxx4t0M/K9JDUCOC35aKw8kqga",
+    "telefono": "8888-1111"
+}
+
+### Insertar recepcionista
+POST {{uri}}
+Content-Type: application/json
+
+{
+    "rol_id": 2,
+    "nombre": "María",
+    "apellidos": "Rodríguez Solís",
+    "email": "recepcion@hotel.com",
+    "password_hash": "$2y$10$q0ODEJXIzDy3J9Ck9LcOyuMJVf.Kxx4t0M/K9JDUCOC35aKw8kqga",
+    "telefono": "8888-2222"
+}
+
+### Insertar cliente Laura
+POST {{uri}}
+Content-Type: application/json
+
+{
+    "rol_id": 3,
+    "nombre": "Laura",
+    "apellidos": "Mora Castro",
+    "email": "laura@correo.com",
+    "password_hash": "$2y$10$q0ODEJXIzDy3J9Ck9LcOyuMJVf.Kxx4t0M/K9JDUCOC35aKw8kqga",
+    "telefono": "8888-3333"
+}
+
+### Insertar cliente Carlos (sin teléfono)
+POST {{uri}}
+Content-Type: application/json
+
+{
+    "rol_id": 3,
+    "nombre": "Carlos",
+    "apellidos": "Vargas Quesada",
+    "email": "carlos@correo.com",
+    "password_hash": "$2y$10$q0ODEJXIzDy3J9Ck9LcOyuMJVf.Kxx4t0M/K9JDUCOC35aKw8kqga"
+}
+
+### Insertar usuario temporal (se elimina al final)
+POST {{uri}}
+Content-Type: application/json
+
+{
+    "rol_id": 3,
+    "nombre": "Temporal",
+    "apellidos": "De Prueba",
+    "email": "temporal@correo.com",
+    "password_hash": "$2y$10$q0ODEJXIzDy3J9Ck9LcOyuMJVf.Kxx4t0M/K9JDUCOC35aKw8kqga"
+}
+
+### Insertar con campos vacíos (422)
+POST {{uri}}
+Content-Type: application/json
+
+{
+    "rol_id": "",
+    "nombre": "",
+    "apellidos": "",
+    "email": "",
+    "password_hash": ""
+}
+
+### Insertar con activo distinto de 0 o 1 (422)
+POST {{uri}}
+Content-Type: application/json
+
+{
+    "rol_id": 3,
+    "nombre": "Ana",
+    "apellidos": "Pérez",
+    "email": "ana@correo.com",
+    "password_hash": "$2y$10$q0ODEJXIzDy3J9Ck9LcOyuMJVf.Kxx4t0M/K9JDUCOC35aKw8kqga",
+    "activo": 5
+}
+
+### Insertar con un rol que no existe (422)
+POST {{uri}}
+Content-Type: application/json
+
+{
+    "rol_id": 9999,
+    "nombre": "Ana",
+    "apellidos": "Pérez",
+    "email": "ana@correo.com",
+    "password_hash": "$2y$10$q0ODEJXIzDy3J9Ck9LcOyuMJVf.Kxx4t0M/K9JDUCOC35aKw8kqga"
+}
+
+### Insertar con email repetido (409)
+POST {{uri}}
+Content-Type: application/json
+
+{
+    "rol_id": 3,
+    "nombre": "Otra",
+    "apellidos": "Laura",
+    "email": "laura@correo.com",
+    "password_hash": "$2y$10$q0ODEJXIzDy3J9Ck9LcOyuMJVf.Kxx4t0M/K9JDUCOC35aKw8kqga"
+}
+
+### Insertar con email repetido en mayúsculas (409)
+POST {{uri}}
+Content-Type: application/json
+
+{
+    "rol_id": 3,
+    "nombre": "Otra",
+    "apellidos": "Laura",
+    "email": "LAURA@correo.com",
+    "password_hash": "$2y$10$q0ODEJXIzDy3J9Ck9LcOyuMJVf.Kxx4t0M/K9JDUCOC35aKw8kqga"
+}
+
+### Listar todos los usuarios (no debe mostrar password_hash)
+GET {{uri}}
+
+### Obtener usuario por id
+GET {{uri}}/3
+
+### Usuario que no existe (404)
+GET {{uri}}/9999
+
+### Actualizar teléfono
+PUT {{uri}}/4
+Content-Type: application/json
+
+{
+    "telefono": "8888-4444"
+}
+
+### Actualizar con un rol que no existe (422)
+PUT {{uri}}/4
+Content-Type: application/json
+
+{
+    "rol_id": 9999
+}
+
+### Actualizar a un email que ya existe (409)
+PUT {{uri}}/4
+Content-Type: application/json
+
+{
+    "email": "laura@correo.com"
+}
+
+### Desactivar usuario (borrado lógico)
+PUT {{uri}}/5
+Content-Type: application/json
+
+{
+    "activo": 0
+}
+
+### Eliminar usuario temporal
+DELETE {{uri}}/5
+
+### Eliminar un rol que tiene usuarios (409)
+DELETE {{host}}/roles/1
+
+###

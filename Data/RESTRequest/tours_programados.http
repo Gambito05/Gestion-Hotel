@@ -1,0 +1,140 @@
+@host = http://localhost:8080/api
+@uri = {{host}}/tours-programados
+
+### Programar Volcán Arenal con Carlos
+POST {{uri}}
+Content-Type: application/json
+
+{
+    "tour_id": 1,
+    "guia_id": 1,
+    "fecha_hora_inicio": "2026-12-19 08:00:00",
+    "cupo": 15
+}
+
+### Programar Canopy con Ana
+POST {{uri}}
+Content-Type: application/json
+
+{
+    "tour_id": 2,
+    "guia_id": 2,
+    "fecha_hora_inicio": "2026-12-20 09:00:00",
+    "cupo": 10
+}
+
+### Programar Aguas termales sin guía
+POST {{uri}}
+Content-Type: application/json
+
+{
+    "tour_id": 3,
+    "fecha_hora_inicio": "2026-12-20 16:00:00",
+    "cupo": 20
+}
+
+### Programar tour temporal (se elimina al final)
+POST {{uri}}
+Content-Type: application/json
+
+{
+    "tour_id": 1,
+    "fecha_hora_inicio": "2026-12-27 08:00:00",
+    "cupo": 15
+}
+
+### Insertar con datos inválidos (422)
+POST {{uri}}
+Content-Type: application/json
+
+{
+    "tour_id": "",
+    "fecha_hora_inicio": "",
+    "cupo": 0
+}
+
+### Insertar con un tour que no existe (422)
+POST {{uri}}
+Content-Type: application/json
+
+{
+    "tour_id": 9999,
+    "fecha_hora_inicio": "2026-12-21 08:00:00",
+    "cupo": 10
+}
+
+### Insertar con un guía que no existe (422)
+POST {{uri}}
+Content-Type: application/json
+
+{
+    "tour_id": 1,
+    "guia_id": 9999,
+    "fecha_hora_inicio": "2026-12-21 08:00:00",
+    "cupo": 10
+}
+
+### Insertar con una fecha que no existe (422)
+POST {{uri}}
+Content-Type: application/json
+
+{
+    "tour_id": 1,
+    "fecha_hora_inicio": "2026-13-45 08:00:00",
+    "cupo": 10
+}
+
+### Insertar con un estado que no existe (422)
+POST {{uri}}
+Content-Type: application/json
+
+{
+    "tour_id": 1,
+    "fecha_hora_inicio": "2026-12-21 08:00:00",
+    "cupo": 10,
+    "estado": "LLENO"
+}
+
+### Listar todos los tours programados
+GET {{uri}}
+
+### Obtener tour programado por id
+GET {{uri}}/1
+
+### Tour programado que no existe (404)
+GET {{uri}}/9999
+
+### Asignar guía a Aguas termales
+PUT {{uri}}/3
+Content-Type: application/json
+
+{
+    "guia_id": 1
+}
+
+### Cancelar tour programado
+PUT {{uri}}/4
+Content-Type: application/json
+
+{
+    "estado": "CANCELADO"
+}
+
+### Actualizar con un estado que no existe (422)
+PUT {{uri}}/4
+Content-Type: application/json
+
+{
+    "estado": "SUSPENDIDO"
+}
+
+### Eliminar tour programado temporal
+DELETE {{uri}}/4
+
+### Eliminar un tour que tiene tours programados (409)
+DELETE {{host}}/tours/1
+
+### Eliminar un guía que tiene tours programados (409)
+DELETE {{host}}/guias/1
+
+###

@@ -1,0 +1,80 @@
+@host = http://localhost:8080/api
+@uri = {{host}}/idiomas
+
+### Insertar idioma Español
+POST {{uri}}
+Content-Type: application/json
+
+{
+    "nombre": "Español"
+}
+
+### Insertar idioma Inglés
+POST {{uri}}
+Content-Type: application/json
+
+{
+    "nombre": "Inglés"
+}
+
+### Insertar idioma Francés
+POST {{uri}}
+Content-Type: application/json
+
+{
+    "nombre": "Francés"
+}
+
+### Insertar idioma temporal (se elimina al final)
+POST {{uri}}
+Content-Type: application/json
+
+{
+    "nombre": "Temporal"
+}
+
+### Insertar con nombre vacío (422)
+POST {{uri}}
+Content-Type: application/json
+
+{
+    "nombre": ""
+}
+
+### Insertar idioma repetido (409)
+POST {{uri}}
+Content-Type: application/json
+
+{
+    "nombre": "Inglés"
+}
+
+### Listar todos los idiomas
+GET {{uri}}
+
+### Obtener idioma por id
+GET {{uri}}/2
+
+### Idioma que no existe (404)
+GET {{uri}}/9999
+
+### Actualizar nombre
+PUT {{uri}}/4
+Content-Type: application/json
+
+{
+    "nombre": "Alemán"
+}
+
+### Actualizar a un nombre que ya existe (409)
+PUT {{uri}}/4
+Content-Type: application/json
+
+{
+    "nombre": "Español"
+}
+
+### Eliminar idioma temporal
+DELETE {{uri}}/4
+
+###

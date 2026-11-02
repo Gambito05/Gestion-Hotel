@@ -1,0 +1,128 @@
+@host = http://localhost:8080/api
+@uri = {{host}}/reservas-tour
+
+### Laura reserva Volcán Arenal para 4 personas
+POST {{uri}}
+Content-Type: application/json
+
+{
+    "codigo": "RT-0001",
+    "tour_programado_id": 1,
+    "cliente_id": 3,
+    "personas": 4,
+    "precio_persona": 25000,
+    "total": 100000
+}
+
+### Laura reserva Canopy para 2 personas
+POST {{uri}}
+Content-Type: application/json
+
+{
+    "codigo": "RT-0002",
+    "tour_programado_id": 2,
+    "cliente_id": 3,
+    "personas": 2,
+    "precio_persona": 38000,
+    "total": 76000,
+    "estado": "CONFIRMADA"
+}
+
+### Reserva de tour temporal (se elimina al final)
+POST {{uri}}
+Content-Type: application/json
+
+{
+    "codigo": "RT-0003",
+    "tour_programado_id": 3,
+    "cliente_id": 4,
+    "personas": 1,
+    "precio_persona": 20000,
+    "total": 20000
+}
+
+### Insertar con datos inválidos (422)
+POST {{uri}}
+Content-Type: application/json
+
+{
+    "codigo": "",
+    "tour_programado_id": "",
+    "cliente_id": "",
+    "personas": 0,
+    "precio_persona": 0,
+    "total": -5
+}
+
+### Insertar con un tour programado que no existe (422)
+POST {{uri}}
+Content-Type: application/json
+
+{
+    "codigo": "RT-0010",
+    "tour_programado_id": 9999,
+    "cliente_id": 3,
+    "personas": 1,
+    "precio_persona": 25000,
+    "total": 25000
+}
+
+### Insertar con un estado que no existe (422)
+POST {{uri}}
+Content-Type: application/json
+
+{
+    "codigo": "RT-0010",
+    "tour_programado_id": 1,
+    "cliente_id": 4,
+    "personas": 1,
+    "precio_persona": 25000,
+    "total": 25000,
+    "estado": "LISTA"
+}
+
+### Insertar con código repetido (409)
+POST {{uri}}
+Content-Type: application/json
+
+{
+    "codigo": "RT-0001",
+    "tour_programado_id": 1,
+    "cliente_id": 4,
+    "personas": 1,
+    "precio_persona": 25000,
+    "total": 25000
+}
+
+### Listar todas las reservas de tour
+GET {{uri}}
+
+### Obtener reserva de tour por id
+GET {{uri}}/1
+
+### Reserva de tour que no existe (404)
+GET {{uri}}/9999
+
+### Confirmar reserva de tour
+PUT {{uri}}/1
+Content-Type: application/json
+
+{
+    "estado": "CONFIRMADA"
+}
+
+### Actualizar con personas en 0 (422)
+PUT {{uri}}/1
+Content-Type: application/json
+
+{
+    "personas": 0
+}
+
+### Eliminar reserva de tour temporal
+DELETE {{uri}}/3
+
+### Eliminar un tour programado que tiene reservas (409)
+DELETE {{host}}/tours-programados/1
+
+###
