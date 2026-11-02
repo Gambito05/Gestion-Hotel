@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Controllers;
+namespace App\controllers;
 
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
@@ -8,12 +8,85 @@ use Slim\Routing\RouteCollectorProxy;
 
 
 $app->group('/api', function (RouteCollectorProxy $api) {
-    $api->group('/pacientes', function (RouteCollectorProxy $endpoint) {
-        $endpoint->get('[/{id}]', Paciente::class . ':read');
-        $endpoint->get('/filter/{offset}/{limit}', Paciente::class . ':filter');
-        $endpoint->post('', Paciente::class . ':create');
-        $endpoint->put('/{id}', Paciente::class . ':update');
-        $endpoint->delete('/{id}', Paciente::class . ':delete');
+    $api->group('/roles', function (RouteCollectorProxy $endpoint) {
+        $endpoint->get('[/{id}]', Rol::class . ':read');
+        $endpoint->post('', Rol::class . ':create');
+        $endpoint->put('/{id}', Rol::class . ':update');
+        $endpoint->delete('/{id}', Rol::class . ':delete');
+    });
+    $api->group('/usuarios', function (RouteCollectorProxy $endpoint) {
+        $endpoint->get('[/{id}]', Usuario::class . ':read');
+        $endpoint->post('', Usuario::class . ':create');
+        $endpoint->put('/{id}', Usuario::class . ':update');
+        $endpoint->delete('/{id}', Usuario::class . ':delete');
+    });
+    $api->group('/tipos-habitacion', function (RouteCollectorProxy $endpoint) {
+        $endpoint->get('[/{id}]', TipoHabitacion::class . ':read');
+        $endpoint->post('', TipoHabitacion::class . ':create');
+        $endpoint->put('/{id}', TipoHabitacion::class . ':update');
+        $endpoint->delete('/{id}', TipoHabitacion::class . ':delete');
+    });
+    $api->group('/servicios-habitacion', function (RouteCollectorProxy $endpoint) {
+        $endpoint->get('[/{id}]', ServicioHabitacion::class . ':read');
+        $endpoint->post('', ServicioHabitacion::class . ':create');
+        $endpoint->put('/{id}', ServicioHabitacion::class . ':update');
+        $endpoint->delete('/{id}', ServicioHabitacion::class . ':delete');
+    });
+    $api->group('/habitaciones', function (RouteCollectorProxy $endpoint) {
+        $endpoint->get('[/{id}]', Habitacion::class . ':read');
+        $endpoint->post('', Habitacion::class . ':create');
+        $endpoint->put('/{id}', Habitacion::class . ':update');
+        $endpoint->delete('/{id}', Habitacion::class . ':delete');
+    });
+    $api->group('/guias', function (RouteCollectorProxy $endpoint) {
+        $endpoint->get('[/{id}]', Guia::class . ':read');
+        $endpoint->post('', Guia::class . ':create');
+        $endpoint->put('/{id}', Guia::class . ':update');
+        $endpoint->delete('/{id}', Guia::class . ':delete');
+    });
+    $api->group('/idiomas', function (RouteCollectorProxy $endpoint) {
+        $endpoint->get('[/{id}]', Idioma::class . ':read');
+        $endpoint->post('', Idioma::class . ':create');
+        $endpoint->put('/{id}', Idioma::class . ':update');
+        $endpoint->delete('/{id}', Idioma::class . ':delete');
+    });
+    $api->group('/tours', function (RouteCollectorProxy $endpoint) {
+        $endpoint->get('[/{id}]', Tour::class . ':read');
+        $endpoint->post('', Tour::class . ':create');
+        $endpoint->put('/{id}', Tour::class . ':update');
+        $endpoint->delete('/{id}', Tour::class . ':delete');
+    });
+    $api->group('/tours-programados', function (RouteCollectorProxy $endpoint) {
+        $endpoint->get('[/{id}]', TourProgramado::class . ':read');
+        $endpoint->post('', TourProgramado::class . ':create');
+        $endpoint->put('/{id}', TourProgramado::class . ':update');
+        $endpoint->delete('/{id}', TourProgramado::class . ':delete');
+    });
+    $api->group('/reservas-habitacion', function (RouteCollectorProxy $endpoint) {
+        $endpoint->get('[/{id}]', ReservaHabitacion::class . ':read');
+        $endpoint->post('', ReservaHabitacion::class . ':create');
+        $endpoint->put('/{id}', ReservaHabitacion::class . ':update');
+        $endpoint->delete('/{id}', ReservaHabitacion::class . ':delete');
+    });
+    $api->group('/reservas-tour', function (RouteCollectorProxy $endpoint) {
+        $endpoint->get('[/{id}]', ReservaTour::class . ':read');
+        $endpoint->post('', ReservaTour::class . ':create');
+        $endpoint->put('/{id}', ReservaTour::class . ':update');
+        $endpoint->delete('/{id}', ReservaTour::class . ':delete');
+    });
+    $api->group('/pagos', function (RouteCollectorProxy $endpoint) {
+        $endpoint->get('[/{id}]', Pago::class . ':read');
+        $endpoint->post('', Pago::class . ':create');
+        $endpoint->put('/{id}', Pago::class . ':update');
+        $endpoint->delete('/{id}', Pago::class . ':delete');
+    });
+    $api->group('/servicios-incluidos', function (RouteCollectorProxy $endpoint) {
+        $endpoint->get('', ServicioIncluido::class . ':read');
+        $endpoint->post('', ServicioIncluido::class . ':create');
+    });
+    $api->group('/idiomas-guia', function (RouteCollectorProxy $endpoint) {
+        $endpoint->get('', IdiomaGuia::class . ':read');
+        $endpoint->post('', IdiomaGuia::class . ':create');
     });
 
 });

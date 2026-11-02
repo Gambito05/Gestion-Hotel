@@ -1,0 +1,21 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class RolModel extends Model {
+    protected $table = 'roles';
+
+    public $timestamps = false;
+
+    protected $fillable = [
+        'nombre',
+    ];
+
+    protected $casts = [
+        'id' => 'integer',
+    ];
+}

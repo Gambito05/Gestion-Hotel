@@ -18,6 +18,7 @@ CREATE TABLE tipos_habitacion (
   descripcion   TEXT              NULL,
   capacidad     TINYINT UNSIGNED  NOT NULL,
   precio_noche  DECIMAL(10,2)     NOT NULL,
+  foto_url VARCHAR(255) NULL,
   activo        BOOLEAN           NOT NULL DEFAULT 1,
   CONSTRAINT uq_tipos_habitacion_nombre UNIQUE (nombre),
   CONSTRAINT chk_tipos_habitacion_capacidad CHECK (capacidad > 0),

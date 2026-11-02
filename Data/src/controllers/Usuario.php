@@ -1,0 +1,238 @@
+<?php
+ 
+namespace App\controllers;
+ 
+use App\Models\UsuarioModel;
+use Illuminate\Database\QueryException;
+use Psr\Http\Message\ResponseInterface as Response;
+use Psr\Http\Message\ServerRequestInterface as Request;
+use Psr\Container\ContainerInterface;
+ 
+class Usuario {
+    private ContainerInterface $container;
+ 
+    public function __construct(ContainerInterface $c){
+        $this->container = $c;
+    }
+ 
+    public function read(Request $request, Response $response, array $args): Response {
+        $this->container->get('eloquent');
+        if(isset($args['id'])){
+            $usuario = UsuarioModel::query()
+                ->select(['id', 'rol_id', 'nombre', 'apellidos', 'email', 'telefono', 'activo'])
+                ->find($args['id']);
+ 
+            if ($usuario === null) {
+                return $this->json($response, ['error' => 'Usuario no encontrado.'], 404);
+            }
+ 
+            return $this->json($response, ['data' => $usuario], 200);
+        }
+ 
+        $usuarios = UsuarioModel::query()
+                ->select(['id', 'rol_id', 'nombre', 'apellidos', 'email', 'telefono', 'activo'])
+                ->get()
+                ->toArray();
+            return $this->json($response, ['data' => $usuarios], 200);
+    }
+ 
+    public function create(Request $request, Response $response, array $args): Response {
+        $data = $request->getParsedBody();
+ 
+        $data = is_array($data) ? $data : [];
+ 
+        $errors = [];
+        $rolId = filter_var($data['rol_id'] ?? '', FILTER_VALIDATE_INT);
+        $nombre = trim((string) ($data['nombre'] ?? ''));
+        $apellidos = trim((string) ($data['apellidos'] ?? ''));
+        $email = trim((string) ($data['email'] ?? ''));
+        $passwordHash = trim((string) ($data['password_hash'] ?? ''));
+        $telefono = isset($data['telefono']) ? trim((string) $data['telefono']) : null;
+        $activo = filter_var($data['activo'] ?? 1, FILTER_VALIDATE_INT);
+ 
+        if ($rolId === false || $rolId < 1) {
+            $errors['rol_id'] = 'Es obligatorio y debe ser un id válido.';
+        }
+        if ($nombre === '' || mb_strlen($nombre) > 80) {
+            $errors['nombre'] = 'Es obligatorio y debe tener máximo 80 caracteres.';
+        }
+        if ($apellidos === '' || mb_strlen($apellidos) > 120) {
+            $errors['apellidos'] = 'Es obligatorio y debe tener máximo 120 caracteres.';
+        }
+        if ($email === '' || mb_strlen($email) > 150) {
+            $errors['email'] = 'Es obligatorio y debe tener máximo 150 caracteres.';
+        }
+        if ($passwordHash === '' || mb_strlen($passwordHash) > 255) {
+            $errors['password_hash'] = 'Es obligatorio y debe tener máximo 255 caracteres.';
+        }
+        if ($telefono !== null && mb_strlen($telefono) > 20) {
+            $errors['telefono'] = 'Debe tener máximo 20 caracteres.';
+        }
+        if ($telefono !== null && $telefono === '') {
+            $telefono = null;
+        }
+        if ($activo === false || $activo < 0 || $activo > 1) {
+            $errors['activo'] = 'Debe ser 0 o 1.';
+        }
+ 
+        if ($errors !== []) {
+            return $this->json($response, ['errors' => $errors], 422);
+        }
+ 
+        try {
+            $this->container->get('eloquent');
+            $usuario = UsuarioModel::create([
+                'rol_id' => $rolId,
+                'nombre' => $nombre,
+                'apellidos' => $apellidos,
+                'email' => $email,
+                'password_hash' => $passwordHash,
+                'telefono' => $telefono,
+                'activo' => $activo,
+            ]);
+        } catch (QueryException $exception) {
+            if ((int) ($exception->errorInfo[1] ?? 0) === 1062) { #1062: el valor ya existe en una columna UNIQUE
+                return $this->json($response, ['error' => 'El email ya está registrado.'], 409);
+            }
+            if ((int) ($exception->errorInfo[1] ?? 0) === 1452) { #1452: la llave foránea apunta a un registro que no existe
+                return $this->json($response, ['error' => 'Uno de los registros relacionados no existe.'], 422);
+            }
+            throw $exception;
+        }
+ 
+        return $this->json($response, ['data' => [
+            'id' => $usuario->id,
+            'rol_id' => $usuario->rol_id,
+            'nombre' => $usuario->nombre,
+            'apellidos' => $usuario->apellidos,
+            'email' => $usuario->email,
+            'telefono' => $usuario->telefono,
+            'activo' => $usuario->activo,
+        ]], 201);
+    }
+ 
+    public function update(Request $request, Response $response, array $args): Response {
+        $eloquent = $this->container->get('eloquent');
+        if (isset($args['id'])) {
+            $usuario = UsuarioModel::find($args['id']);
+ 
+            if ($usuario === null) {
+                return $this->json($response, ['error' => 'Usuario no encontrado.'], 404);
+            }
+ 
+            $data = $request->getParsedBody();
+            $data = is_array($data) ? $data : [];
+ 
+            if (isset($data['rol_id'])) {
+                $rolId = filter_var($data['rol_id'], FILTER_VALIDATE_INT);
+                if ($rolId === false || $rolId < 1) {
+                    return $this->json($response, ['error' => 'Rol inválido.'], 422);
+                }
+                $usuario->rol_id = $rolId;
+            }
+
+            if (isset($data['nombre'])) {
+                $nombre = trim((string) $data['nombre']);
+                if ($nombre === '' || mb_strlen($nombre) > 80) {
+                    return $this->json($response, ['error' => 'Nombre inválido.'], 422);
+                }
+                $usuario->nombre = $nombre;
+            }
+
+            if (isset($data['apellidos'])) {
+                $apellidos = trim((string) $data['apellidos']);
+                if ($apellidos === '' || mb_strlen($apellidos) > 120) {
+                    return $this->json($response, ['error' => 'Apellidos inválidos.'], 422);
+                }
+                $usuario->apellidos = $apellidos;
+            }
+
+            if (isset($data['email'])) {
+                $email = trim((string) $data['email']);
+                if ($email === '' || mb_strlen($email) > 150) {
+                    return $this->json($response, ['error' => 'Email inválido.'], 422);
+                }
+                $usuario->email = $email;
+            }
+
+            if (isset($data['password_hash'])) {
+                $passwordHash = trim((string) $data['password_hash']);
+                if ($passwordHash === '' || mb_strlen($passwordHash) > 255) {
+                    return $this->json($response, ['error' => 'Contraseña inválida.'], 422);
+                }
+                $usuario->password_hash = $passwordHash;
+            }
+
+            if (isset($data['telefono'])) {
+                $telefono = trim((string) $data['telefono']);
+                if (mb_strlen($telefono) > 20) {
+                    return $this->json($response, ['error' => 'Teléfono inválido.'], 422);
+                }
+                $usuario->telefono = $telefono === '' ? null : $telefono;
+            }
+
+            if (isset($data['activo'])) {
+                $activo = filter_var($data['activo'], FILTER_VALIDATE_INT);
+                if ($activo === false || $activo < 0 || $activo > 1) {
+                    return $this->json($response, ['error' => 'Valor de activo inválido.'], 422);
+                }
+                $usuario->activo = $activo;
+            }
+
+            try {
+                $usuario->save();
+            } catch (QueryException $exception) {
+                if ((int) ($exception->errorInfo[1] ?? 0) === 1062) { #1062: el valor ya existe en una columna UNIQUE
+                    return $this->json($response, ['error' => 'El email ya está registrado.'], 409);
+                }
+                if ((int) ($exception->errorInfo[1] ?? 0) === 1452) { #1452: la llave foránea apunta a un registro que no existe
+                    return $this->json($response, ['error' => 'Uno de los registros relacionados no existe.'], 422);
+                }
+                throw $exception;
+            }
+ 
+            return $this->json($response, ['data' => [
+                'id' => $usuario->id,
+                'rol_id' => $usuario->rol_id,
+                'nombre' => $usuario->nombre,
+                'apellidos' => $usuario->apellidos,
+                'email' => $usuario->email,
+                'telefono' => $usuario->telefono,
+                'activo' => $usuario->activo,
+            ]], 200);
+        }
+    }
+ 
+    public function delete(Request $request, Response $response, array $args): Response {
+        $eloquent = $this->container->get('eloquent');
+        if (isset($args['id'])) {
+            $usuario = UsuarioModel::find($args['id']);
+ 
+            if ($usuario === null) {
+                return $this->json($response, ['error' => 'Usuario no encontrado.'], 404);
+            }
+ 
+            try {
+                $usuario->delete();
+            } catch (QueryException $exception) {
+                if ((int) ($exception->errorInfo[1] ?? 0) === 1451) { #1451: otros registros dependen de este
+                    return $this->json($response, ['error' => 'No se puede eliminar porque tiene registros asociados.'], 409);
+                }
+ 
+                throw $exception;
+            }
+ 
+            return $this->json($response, ['message' => 'Usuario eliminado correctamente.'], 200);
+        }
+    }
+ 
+    private function json(Response $response, array $payload, int $status): Response{
+    $response->getBody()->write(json_encode($payload,
+        JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR));
+ 
+        return $response
+            ->withHeader('Content-Type', 'application/json; charset=UTF-8')
+            ->withStatus($status);
+    }
+ 
+}
