@@ -1,9 +1,4 @@
-CREATE DATABASE IF NOT EXISTS hotel_tours
-  CHARACTER SET utf8mb4
-  COLLATE utf8mb4_unicode_ci;
-
-USE hotel_tours;
-
+SET NAMES utf8mb4;
 
 CREATE TABLE roles (
   id      INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -208,3 +203,11 @@ CREATE TABLE pagos (
   CONSTRAINT fk_pagos_registrado_por FOREIGN KEY (registrado_por)
     REFERENCES usuarios (id) ON DELETE RESTRICT ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+USE gestion_hotel;
+
+INSERT INTO roles(nombre) VALUES ('Admin');
+INSERT INTO roles(nombre) VALUES ('Médico');
+INSERT INTO roles(nombre) VALUES ('Paciente');
+

@@ -7,11 +7,11 @@ Content-Type: application/json
 
 {
     "rol_id": 1,
-    "nombre": "Kevin",
-    "apellidos": "Simpson Varela",
+    "nombre": "Bryan",
+    "apellidos": "Mendez Lara",
     "email": "admin@hotel.com",
     "password_hash": "$2y$10$q0ODEJXIzDy3J9Ck9LcOyuMJVf.Kxx4t0M/K9JDUCOC35aKw8kqga",
-    "telefono": "8888-1111"
+    "telefono": "8899-1122"
 }
 
 ### Insertar recepcionista
