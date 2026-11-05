@@ -66,6 +66,51 @@ class Idioma {
  
         return $this->json($response, ['data' => $idioma->toArray()], 201);
     }
+     public function filter(Request $request, Response $response, array $args): Response {
+        $this->container->get('eloquent');
+
+        $offset = filter_var($args['offset'] ?? 0, FILTER_VALIDATE_INT);
+        $limit = filter_var($args['limit'] ?? 20, FILTER_VALIDATE_INT);
+
+        if ($offset === false || $offset < 0 || $limit === false || $limit < 1 || $limit > 100) {
+            return $this->json($response, [
+                'error' => 'El offset debe ser mayor o igual a 0 y el límite debe estar entre 1 y 100.'],
+                422);
+        }
+
+        $params = $request->getQueryParams();
+        $nombre = trim((string) ($params['nombre'] ?? ''));
+
+        $query = IdiomaModel::query()
+            ->select([
+                'id',
+                'nombre'
+            ]);
+
+        if ($nombre !== '') {
+            $query->where('nombre', 'like', "%{$nombre}%");
+        }
+
+        $total = (clone $query)->count('id');
+
+        $idiomas = $query
+            ->orderBy('nombre')
+            ->offset($offset)
+            ->limit($limit)
+            ->get()
+            ->toArray();
+
+        return $this->json($response, [
+            'data' => $idiomas,
+            'pagination' => [
+                'offset' => $offset,
+                'limit' => $limit,
+                'total' => $total
+            ]
+        ], 200);
+    }
+ 
+  
  
     public function update(Request $request, Response $response, array $args): Response {
         $eloquent = $this->container->get('eloquent');
@@ -123,7 +168,7 @@ class Idioma {
         }
     }
  
-    private function json(Response $response, array $payload, int $status): Response{
+ private function json(Response $response, array $payload, int $status): Response{
     $response->getBody()->write(json_encode($payload,
         JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR));
  

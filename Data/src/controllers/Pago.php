@@ -113,6 +113,80 @@ class Pago {
  
         return $this->json($response, ['data' => $pago->toArray()], 201);
     }
+     public function filter(Request $request, Response $response, array $args): Response {
+        $this->container->get('eloquent');
+
+        $offset = filter_var($args['offset'] ?? 0, FILTER_VALIDATE_INT);
+        $limit = filter_var($args['limit'] ?? 20, FILTER_VALIDATE_INT);
+
+        if ($offset === false || $offset < 0 || $limit === false || $limit < 1 || $limit > 100) {
+            return $this->json($response, [
+                'error' => 'El offset debe ser mayor o igual a 0 y el límite debe estar entre 1 y 100.'],
+                422);
+        }
+
+        $params = $request->getQueryParams();
+        $reservaHabitacionId = filter_var($params['reserva_habitacion_id'] ?? '', FILTER_VALIDATE_INT);
+        $reservaTourId = filter_var($params['reserva_tour_id'] ?? '', FILTER_VALIDATE_INT);
+        $registradoPor = filter_var($params['registrado_por'] ?? '', FILTER_VALIDATE_INT);
+        $moneda = trim((string) ($params['moneda'] ?? ''));
+        $metodo = trim((string) ($params['metodo'] ?? ''));
+        $referencia = trim((string) ($params['referencia'] ?? ''));
+        $fecha = trim((string) ($params['fecha'] ?? ''));
+
+        $query = PagoModel::query()
+            ->select([
+                'id',
+                'reserva_habitacion_id',
+                'reserva_tour_id',
+                'registrado_por',
+                'monto',
+                'moneda',
+                'metodo',
+                'referencia',
+                'pagado_at'
+            ]);
+
+        if ($reservaHabitacionId !== false) {
+            $query->where('reserva_habitacion_id', $reservaHabitacionId);
+        }
+        if ($reservaTourId !== false) {
+            $query->where('reserva_tour_id', $reservaTourId);
+        }
+        if ($registradoPor !== false) {
+            $query->where('registrado_por', $registradoPor);
+        }
+        if ($moneda !== '') {
+            $query->where('moneda', $moneda);
+        }
+        if ($metodo !== '') {
+            $query->where('metodo', $metodo);
+        }
+        if ($referencia !== '') {
+            $query->where('referencia', 'like', "%{$referencia}%");
+        }
+        if ($fecha !== '') {
+            $query->whereDate('pagado_at', $fecha);
+        }
+
+        $total = (clone $query)->count('id');
+
+        $pagos = $query
+            ->orderBy('pagado_at')
+            ->offset($offset)
+            ->limit($limit)
+            ->get()
+            ->toArray();
+
+        return $this->json($response, [
+            'data' => $pagos,
+            'pagination' => [
+                'offset' => $offset,
+                'limit' => $limit,
+                'total' => $total
+            ]
+        ], 200);
+    }
  
     public function update(Request $request, Response $response, array $args): Response {
         $eloquent = $this->container->get('eloquent');

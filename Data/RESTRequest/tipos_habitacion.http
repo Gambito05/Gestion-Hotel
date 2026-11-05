@@ -122,3 +122,13 @@ Content-Type: application/json
 DELETE {{uri}}/4
 
 ###
+### Filtrar (offset 0, límite 10)
+GET {{uri}}/filter/0/10?nombre=&capacidad=2&activo=1
+
+### Filtrar segunda página (offset 10, límite 10)
+GET {{uri}}/filter/10/10
+
+### Filtrar con límite fuera de rango (422)
+GET {{uri}}/filter/0/500
+
+###

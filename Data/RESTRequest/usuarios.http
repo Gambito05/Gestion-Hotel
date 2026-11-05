@@ -173,3 +173,16 @@ DELETE {{uri}}/5
 DELETE {{host}}/roles/1
 
 ###
+### Filtrar (offset 0, límite 10)
+GET {{uri}}/filter/0/10?nombre=&apellidos=&email=&username=&rol=cliente&activo=1
+
+### Filtrar por username
+GET {{uri}}/filter/0/10?username=mora
+
+### Filtrar segunda página (offset 10, límite 10)
+GET {{uri}}/filter/10/10
+
+### Filtrar con límite fuera de rango (422)
+GET {{uri}}/filter/0/500
+
+###

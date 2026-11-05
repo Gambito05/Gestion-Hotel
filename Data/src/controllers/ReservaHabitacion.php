@@ -136,6 +136,80 @@ class ReservaHabitacion {
  
         return $this->json($response, ['data' => $reserva->toArray()], 201);
     }
+    public function filter(Request $request, Response $response, array $args): Response {
+        $this->container->get('eloquent');
+
+        $offset = filter_var($args['offset'] ?? 0, FILTER_VALIDATE_INT);
+        $limit = filter_var($args['limit'] ?? 20, FILTER_VALIDATE_INT);
+
+        if ($offset === false || $offset < 0 || $limit === false || $limit < 1 || $limit > 100) {
+            return $this->json($response, [
+                'error' => 'El offset debe ser mayor o igual a 0 y el límite debe estar entre 1 y 100.'],
+                422);
+        }
+
+        $params = $request->getQueryParams();
+        $codigo = trim((string) ($params['codigo'] ?? ''));
+        $clienteId = filter_var($params['cliente_id'] ?? '', FILTER_VALIDATE_INT);
+        $habitacionId = filter_var($params['habitacion_id'] ?? '', FILTER_VALIDATE_INT);
+        $estado = trim((string) ($params['estado'] ?? ''));
+        $fechaEntrada = trim((string) ($params['fecha_entrada'] ?? ''));
+        $fechaSalida = trim((string) ($params['fecha_salida'] ?? ''));
+
+        $query = ReservaHabitacionModel::query()
+            ->select([
+                'id',
+                'codigo',
+                'cliente_id',
+                'habitacion_id',
+                'registrada_por',
+                'fecha_entrada',
+                'fecha_salida',
+                'huespedes',
+                'precio_noche',
+                'total',
+                'estado',
+                'checkin_at',
+                'checkout_at'
+            ]);
+
+        if ($codigo !== '') {
+            $query->where('codigo', 'like', "%{$codigo}%");
+        }
+        if ($clienteId !== false) {
+            $query->where('cliente_id', $clienteId);
+        }
+        if ($habitacionId !== false) {
+            $query->where('habitacion_id', $habitacionId);
+        }
+        if ($estado !== '') {
+            $query->where('estado', $estado);
+        }
+        if ($fechaEntrada !== '') {
+            $query->whereDate('fecha_entrada', $fechaEntrada);
+        }
+        if ($fechaSalida !== '') {
+            $query->whereDate('fecha_salida', $fechaSalida);
+        }
+
+        $total = (clone $query)->count('id');
+
+        $reservas = $query
+            ->orderBy('fecha_entrada')
+            ->offset($offset)
+            ->limit($limit)
+            ->get()
+            ->toArray();
+
+        return $this->json($response, [
+            'data' => $reservas,
+            'pagination' => [
+                'offset' => $offset,
+                'limit' => $limit,
+                'total' => $total
+            ]
+        ], 200);
+    }
  
     public function update(Request $request, Response $response, array $args): Response {
         $eloquent = $this->container->get('eloquent');

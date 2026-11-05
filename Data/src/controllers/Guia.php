@@ -36,6 +36,8 @@ class Guia {
             return $this->json($response, ['data' => $guias], 200);
     }
  
+
+ 
     public function create(Request $request, Response $response, array $args): Response {
         $data = $request->getParsedBody();
  
@@ -76,6 +78,60 @@ class Guia {
  
         return $this->json($response, ['data' => $guia->toArray()], 201);
     }
+    public function filter(Request $request, Response $response, array $args): Response {
+        $this->container->get('eloquent');
+
+        $offset = filter_var($args['offset'] ?? 0, FILTER_VALIDATE_INT);
+        $limit = filter_var($args['limit'] ?? 20, FILTER_VALIDATE_INT);
+
+        if ($offset === false || $offset < 0 || $limit === false || $limit < 1 || $limit > 100) {
+            return $this->json($response, [
+                'error' => 'El offset debe ser mayor o igual a 0 y el límite debe estar entre 1 y 100.'],
+                422);
+        }
+
+        $params = $request->getQueryParams();
+        $nombre = trim((string) ($params['nombre'] ?? ''));
+        $telefono = trim((string) ($params['telefono'] ?? ''));
+        $activo = filter_var($params['activo'] ?? '', FILTER_VALIDATE_INT);
+
+        $query = GuiaModel::query()
+            ->select([
+                'id',
+                'nombre',
+                'telefono',
+                'activo'
+            ]);
+
+        if ($nombre !== '') {
+            $query->where('nombre', 'like', "%{$nombre}%");
+        }
+        if ($telefono !== '') {
+            $query->where('telefono', 'like', "%{$telefono}%");
+        }
+        if ($activo !== false) {
+            $query->where('activo', $activo);
+        }
+
+        $total = (clone $query)->count('id');
+
+        $guias = $query
+            ->orderBy('nombre')
+            ->offset($offset)
+            ->limit($limit)
+            ->get()
+            ->toArray();
+
+        return $this->json($response, [
+            'data' => $guias,
+            'pagination' => [
+                'offset' => $offset,
+                'limit' => $limit,
+                'total' => $total
+            ]
+        ], 200);
+    }
+ 
  
     public function update(Request $request, Response $response, array $args): Response {
         $eloquent = $this->container->get('eloquent');

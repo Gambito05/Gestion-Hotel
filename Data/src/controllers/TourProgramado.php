@@ -92,6 +92,71 @@ class TourProgramado {
  
         return $this->json($response, ['data' => $tourProgramado->toArray()], 201);
     }
+    public function filter(Request $request, Response $response, array $args): Response {
+        $this->container->get('eloquent');
+
+        $offset = filter_var($args['offset'] ?? 0, FILTER_VALIDATE_INT);
+        $limit = filter_var($args['limit'] ?? 20, FILTER_VALIDATE_INT);
+
+        if ($offset === false || $offset < 0 || $limit === false || $limit < 1 || $limit > 100) {
+            return $this->json($response, [
+                'error' => 'El offset debe ser mayor o igual a 0 y el límite debe estar entre 1 y 100.'],
+                422);
+        }
+
+        $params = $request->getQueryParams();
+        $tourId = filter_var($params['tour_id'] ?? '', FILTER_VALIDATE_INT);
+        $tour = trim((string) ($params['tour'] ?? ''));
+        $guiaId = filter_var($params['guia_id'] ?? '', FILTER_VALIDATE_INT);
+        $estado = trim((string) ($params['estado'] ?? ''));
+        $fecha = trim((string) ($params['fecha'] ?? ''));
+
+        $query = TourProgramadoModel::query()
+            ->select([
+                'tours_programados.id',
+                'tours_programados.tour_id',
+                'tours.nombre as tour_nombre',
+                'tours_programados.guia_id',
+                'tours_programados.fecha_hora_inicio',
+                'tours_programados.cupo',
+                'tours_programados.estado'
+            ])
+            ->join('tours', 'tours_programados.tour_id', '=', 'tours.id');
+
+        if ($tourId !== false) {
+            $query->where('tours_programados.tour_id', $tourId);
+        }
+        if ($tour !== '') {
+            $query->where('tours.nombre', 'like', "%{$tour}%");
+        }
+        if ($guiaId !== false) {
+            $query->where('tours_programados.guia_id', $guiaId);
+        }
+        if ($estado !== '') {
+            $query->where('tours_programados.estado', $estado);
+        }
+        if ($fecha !== '') {
+            $query->whereDate('tours_programados.fecha_hora_inicio', $fecha);
+        }
+
+        $total = (clone $query)->count('tours_programados.id');
+
+        $toursProgramados = $query
+            ->orderBy('tours_programados.fecha_hora_inicio')
+            ->offset($offset)
+            ->limit($limit)
+            ->get()
+            ->toArray();
+
+        return $this->json($response, [
+            'data' => $toursProgramados,
+            'pagination' => [
+                'offset' => $offset,
+                'limit' => $limit,
+                'total' => $total
+            ]
+        ], 200);
+    }
  
     public function update(Request $request, Response $response, array $args): Response {
         $eloquent = $this->container->get('eloquent');

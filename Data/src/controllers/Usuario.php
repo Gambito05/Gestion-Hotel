@@ -15,11 +15,11 @@ class Usuario {
         $this->container = $c;
     }
  
-    public function read(Request $request, Response $response, array $args): Response {
+     public function read(Request $request, Response $response, array $args): Response {
         $this->container->get('eloquent');
         if(isset($args['id'])){
             $usuario = UsuarioModel::query()
-                ->select(['id', 'rol_id', 'nombre', 'apellidos', 'email', 'telefono', 'activo'])
+                ->select(['id', 'rol_id', 'nombre', 'apellidos', 'email', 'username', 'telefono', 'activo'])
                 ->find($args['id']);
  
             if ($usuario === null) {
@@ -30,11 +30,12 @@ class Usuario {
         }
  
         $usuarios = UsuarioModel::query()
-                ->select(['id', 'rol_id', 'nombre', 'apellidos', 'email', 'telefono', 'activo'])
+                ->select(['id', 'rol_id', 'nombre', 'apellidos', 'email', 'username', 'telefono', 'activo'])
                 ->get()
                 ->toArray();
             return $this->json($response, ['data' => $usuarios], 200);
     }
+ 
  
     public function create(Request $request, Response $response, array $args): Response {
         $data = $request->getParsedBody();
@@ -46,6 +47,7 @@ class Usuario {
         $nombre = trim((string) ($data['nombre'] ?? ''));
         $apellidos = trim((string) ($data['apellidos'] ?? ''));
         $email = trim((string) ($data['email'] ?? ''));
+        $username = isset($data['username']) ? trim((string) $data['username']) : null;
         $passwordHash = trim((string) ($data['password_hash'] ?? ''));
         $telefono = isset($data['telefono']) ? trim((string) $data['telefono']) : null;
         $activo = filter_var($data['activo'] ?? 1, FILTER_VALIDATE_INT);
@@ -61,6 +63,12 @@ class Usuario {
         }
         if ($email === '' || mb_strlen($email) > 150) {
             $errors['email'] = 'Es obligatorio y debe tener máximo 150 caracteres.';
+        }
+        if ($username !== null && mb_strlen($username) > 50) {
+            $errors['username'] = 'Debe tener máximo 50 caracteres.';
+        }
+        if ($username !== null && $username === '') {
+            $username = null;
         }
         if ($passwordHash === '' || mb_strlen($passwordHash) > 255) {
             $errors['password_hash'] = 'Es obligatorio y debe tener máximo 255 caracteres.';
@@ -86,12 +94,19 @@ class Usuario {
                 'nombre' => $nombre,
                 'apellidos' => $apellidos,
                 'email' => $email,
+                'username' => $username,
                 'password_hash' => $passwordHash,
                 'telefono' => $telefono,
                 'activo' => $activo,
             ]);
         } catch (QueryException $exception) {
             if ((int) ($exception->errorInfo[1] ?? 0) === 1062) { #1062: el valor ya existe en una columna UNIQUE
+                $message = (string) ($exception->errorInfo[2] ?? '');
+
+                if (str_contains($message, 'username')) {
+                    return $this->json($response, ['error' => 'El nombre de usuario ya está registrado.'], 409);
+                }
+
                 return $this->json($response, ['error' => 'El email ya está registrado.'], 409);
             }
             if ((int) ($exception->errorInfo[1] ?? 0) === 1452) { #1452: la llave foránea apunta a un registro que no existe
@@ -106,12 +121,94 @@ class Usuario {
             'nombre' => $usuario->nombre,
             'apellidos' => $usuario->apellidos,
             'email' => $usuario->email,
+            'username' => $usuario->username,
             'telefono' => $usuario->telefono,
             'activo' => $usuario->activo,
         ]], 201);
     }
+
+    public function filter(Request $request, Response $response, array $args): Response {
+        $this->container->get('eloquent');
+
+        $offset = filter_var($args['offset'] ?? 0, FILTER_VALIDATE_INT);
+        $limit = filter_var($args['limit'] ?? 20, FILTER_VALIDATE_INT);
+
+        if ($offset === false || $offset < 0 || $limit === false || $limit < 1 || $limit > 100) {
+            return $this->json($response, [
+                'error' => 'El offset debe ser mayor o igual a 0 y el límite debe estar entre 1 y 100.'],
+                422);
+        }
+
+        $params = $request->getQueryParams();
+        $nombre = trim((string) ($params['nombre'] ?? ''));
+        $apellidos = trim((string) ($params['apellidos'] ?? ''));
+        $email = trim((string) ($params['email'] ?? ''));
+        $username = trim((string) ($params['username'] ?? ''));
+        $telefono = trim((string) ($params['telefono'] ?? ''));
+        $rol = trim((string) ($params['rol'] ?? ''));
+        $rolId = filter_var($params['rol_id'] ?? '', FILTER_VALIDATE_INT);
+        $activo = filter_var($params['activo'] ?? '', FILTER_VALIDATE_INT);
+
+        $query = UsuarioModel::query()
+            ->select([
+                'usuarios.id',
+                'usuarios.rol_id',
+                'roles.nombre as rol_nombre',
+                'usuarios.nombre',
+                'usuarios.apellidos',
+                'usuarios.email',
+                'usuarios.username',
+                'usuarios.telefono',
+                'usuarios.activo'
+            ])
+            ->join('roles', 'usuarios.rol_id', '=', 'roles.id');
+
+        if ($nombre !== '') {
+            $query->where('usuarios.nombre', 'like', "%{$nombre}%");
+        }
+        if ($apellidos !== '') {
+            $query->where('usuarios.apellidos', 'like', "%{$apellidos}%");
+        }
+        if ($email !== '') {
+            $query->where('usuarios.email', 'like', "%{$email}%");
+        }
+        if ($username !== '') {
+            $query->where('usuarios.username', 'like', "%{$username}%");
+        }
+        if ($telefono !== '') {
+            $query->where('usuarios.telefono', 'like', "%{$telefono}%");
+        }
+        if ($rol !== '') {
+            $query->where('roles.nombre', 'like', "%{$rol}%");
+        }
+        if ($rolId !== false) {
+            $query->where('usuarios.rol_id', $rolId);
+        }
+        if ($activo !== false) {
+            $query->where('usuarios.activo', $activo);
+        }
+
+        $total = (clone $query)->count('usuarios.id');
+
+        $usuarios = $query
+            ->orderBy('usuarios.nombre')
+            ->offset($offset)
+            ->limit($limit)
+            ->get()
+            ->toArray();
+
+        return $this->json($response, [
+            'data' => $usuarios,
+            'pagination' => [
+                'offset' => $offset,
+                'limit' => $limit,
+                'total' => $total
+            ]
+        ], 200);
+    }
  
-    public function update(Request $request, Response $response, array $args): Response {
+ 
+     public function update(Request $request, Response $response, array $args): Response {
         $eloquent = $this->container->get('eloquent');
         if (isset($args['id'])) {
             $usuario = UsuarioModel::find($args['id']);
@@ -155,6 +252,14 @@ class Usuario {
                 $usuario->email = $email;
             }
 
+            if (isset($data['username'])) {
+                $username = trim((string) $data['username']);
+                if ($username === '' || mb_strlen($username) > 50) {
+                    return $this->json($response, ['error' => 'Nombre de usuario inválido.'], 422);
+                }
+                $usuario->username = $username;
+            }
+
             if (isset($data['password_hash'])) {
                 $passwordHash = trim((string) $data['password_hash']);
                 if ($passwordHash === '' || mb_strlen($passwordHash) > 255) {
@@ -183,6 +288,12 @@ class Usuario {
                 $usuario->save();
             } catch (QueryException $exception) {
                 if ((int) ($exception->errorInfo[1] ?? 0) === 1062) { #1062: el valor ya existe en una columna UNIQUE
+                    $message = (string) ($exception->errorInfo[2] ?? '');
+
+                    if (str_contains($message, 'username')) {
+                        return $this->json($response, ['error' => 'El nombre de usuario ya está registrado.'], 409);
+                    }
+
                     return $this->json($response, ['error' => 'El email ya está registrado.'], 409);
                 }
                 if ((int) ($exception->errorInfo[1] ?? 0) === 1452) { #1452: la llave foránea apunta a un registro que no existe
@@ -197,6 +308,7 @@ class Usuario {
                 'nombre' => $usuario->nombre,
                 'apellidos' => $usuario->apellidos,
                 'email' => $usuario->email,
+                'username' => $usuario->username,
                 'telefono' => $usuario->telefono,
                 'activo' => $usuario->activo,
             ]], 200);

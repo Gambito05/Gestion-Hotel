@@ -63,6 +63,66 @@ class IdiomaGuia {
  
         return $this->json($response, ['data' => ['guia_id' => $guiaId, 'idioma_id' => $idiomaId]], 201);
     }
+    public function filter(Request $request, Response $response, array $args): Response {
+        $this->container->get('eloquent');
+
+        $offset = filter_var($args['offset'] ?? 0, FILTER_VALIDATE_INT);
+        $limit = filter_var($args['limit'] ?? 20, FILTER_VALIDATE_INT);
+
+        if ($offset === false || $offset < 0 || $limit === false || $limit < 1 || $limit > 100) {
+            return $this->json($response, [
+                'error' => 'El offset debe ser mayor o igual a 0 y el límite debe estar entre 1 y 100.'],
+                422);
+        }
+
+        $params = $request->getQueryParams();
+        $guiaId = filter_var($params['guia_id'] ?? '', FILTER_VALIDATE_INT);
+        $guia = trim((string) ($params['guia'] ?? ''));
+        $idiomaId = filter_var($params['idioma_id'] ?? '', FILTER_VALIDATE_INT);
+        $idioma = trim((string) ($params['idioma'] ?? ''));
+
+        $query = IdiomaGuiaModel::query()
+            ->select([
+                'idiomas_guia.guia_id',
+                'guias.nombre as guia_nombre',
+                'idiomas_guia.idioma_id',
+                'idiomas.nombre as idioma_nombre'
+            ])
+            ->join('guias', 'idiomas_guia.guia_id', '=', 'guias.id')
+            ->join('idiomas', 'idiomas_guia.idioma_id', '=', 'idiomas.id');
+
+        if ($guiaId !== false) {
+            $query->where('idiomas_guia.guia_id', $guiaId);
+        }
+        if ($guia !== '') {
+            $query->where('guias.nombre', 'like', "%{$guia}%");
+        }
+        if ($idiomaId !== false) {
+            $query->where('idiomas_guia.idioma_id', $idiomaId);
+        }
+        if ($idioma !== '') {
+            $query->where('idiomas.nombre', 'like', "%{$idioma}%");
+        }
+
+        $total = (clone $query)->count('idiomas_guia.guia_id');
+
+        $idiomasGuia = $query
+            ->orderBy('guias.nombre')
+            ->offset($offset)
+            ->limit($limit)
+            ->get()
+            ->toArray();
+
+        return $this->json($response, [
+            'data' => $idiomasGuia,
+            'pagination' => [
+                'offset' => $offset,
+                'limit' => $limit,
+                'total' => $total
+            ]
+        ], 200);
+    }
+ 
  
  
     private function json(Response $response, array $payload, int $status): Response{

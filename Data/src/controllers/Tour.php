@@ -117,6 +117,66 @@ class Tour {
  
         return $this->json($response, ['data' => $tour->toArray()], 201);
     }
+    public function filter(Request $request, Response $response, array $args): Response {
+        $this->container->get('eloquent');
+
+        $offset = filter_var($args['offset'] ?? 0, FILTER_VALIDATE_INT);
+        $limit = filter_var($args['limit'] ?? 20, FILTER_VALIDATE_INT);
+
+        if ($offset === false || $offset < 0 || $limit === false || $limit < 1 || $limit > 100) {
+            return $this->json($response, [
+                'error' => 'El offset debe ser mayor o igual a 0 y el límite debe estar entre 1 y 100.'],
+                422);
+        }
+
+        $params = $request->getQueryParams();
+        $nombre = trim((string) ($params['nombre'] ?? ''));
+        $puntoEncuentro = trim((string) ($params['punto_encuentro'] ?? ''));
+        $activo = filter_var($params['activo'] ?? '', FILTER_VALIDATE_INT);
+
+        $query = TourModel::query()
+            ->select([
+                'id',
+                'nombre',
+                'descripcion',
+                'duracion_horas',
+                'precio_persona',
+                'cupo_maximo',
+                'punto_encuentro',
+                'latitud',
+                'longitud',
+                'foto_url',
+                'activo'
+            ]);
+
+        if ($nombre !== '') {
+            $query->where('nombre', 'like', "%{$nombre}%");
+        }
+        if ($puntoEncuentro !== '') {
+            $query->where('punto_encuentro', 'like', "%{$puntoEncuentro}%");
+        }
+        if ($activo !== false) {
+            $query->where('activo', $activo);
+        }
+
+        $total = (clone $query)->count('id');
+
+        $tours = $query
+            ->orderBy('nombre')
+            ->offset($offset)
+            ->limit($limit)
+            ->get()
+            ->toArray();
+
+        return $this->json($response, [
+            'data' => $tours,
+            'pagination' => [
+                'offset' => $offset,
+                'limit' => $limit,
+                'total' => $total
+            ]
+        ], 200);
+    }
  
     public function update(Request $request, Response $response, array $args): Response {
         $eloquent = $this->container->get('eloquent');

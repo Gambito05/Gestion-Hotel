@@ -105,6 +105,68 @@ class ReservaTour {
  
         return $this->json($response, ['data' => $reserva->toArray()], 201);
     }
+     public function filter(Request $request, Response $response, array $args): Response {
+        $this->container->get('eloquent');
+
+        $offset = filter_var($args['offset'] ?? 0, FILTER_VALIDATE_INT);
+        $limit = filter_var($args['limit'] ?? 20, FILTER_VALIDATE_INT);
+
+        if ($offset === false || $offset < 0 || $limit === false || $limit < 1 || $limit > 100) {
+            return $this->json($response, [
+                'error' => 'El offset debe ser mayor o igual a 0 y el límite debe estar entre 1 y 100.'],
+                422);
+        }
+
+        $params = $request->getQueryParams();
+        $codigo = trim((string) ($params['codigo'] ?? ''));
+        $tourProgramadoId = filter_var($params['tour_programado_id'] ?? '', FILTER_VALIDATE_INT);
+        $clienteId = filter_var($params['cliente_id'] ?? '', FILTER_VALIDATE_INT);
+        $estado = trim((string) ($params['estado'] ?? ''));
+
+        $query = ReservaTourModel::query()
+            ->select([
+                'id',
+                'codigo',
+                'tour_programado_id',
+                'cliente_id',
+                'personas',
+                'precio_persona',
+                'total',
+                'estado'
+            ]);
+
+        if ($codigo !== '') {
+            $query->where('codigo', 'like', "%{$codigo}%");
+        }
+        if ($tourProgramadoId !== false) {
+            $query->where('tour_programado_id', $tourProgramadoId);
+        }
+        if ($clienteId !== false) {
+            $query->where('cliente_id', $clienteId);
+        }
+        if ($estado !== '') {
+            $query->where('estado', $estado);
+        }
+
+        $total = (clone $query)->count('id');
+
+        $reservas = $query
+            ->orderBy('codigo')
+            ->offset($offset)
+            ->limit($limit)
+            ->get()
+            ->toArray();
+
+        return $this->json($response, [
+            'data' => $reservas,
+            'pagination' => [
+                'offset' => $offset,
+                'limit' => $limit,
+                'total' => $total
+            ]
+        ], 200);
+    }
+ 
  
     public function update(Request $request, Response $response, array $args): Response {
         $eloquent = $this->container->get('eloquent');

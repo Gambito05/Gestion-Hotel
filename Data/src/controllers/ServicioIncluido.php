@@ -63,6 +63,65 @@ class ServicioIncluido {
  
         return $this->json($response, ['data' => ['tipo_habitacion_id' => $tipoHabitacionId, 'servicio_habitacion_id' => $servicioHabitacionId]], 201);
     }
+     public function filter(Request $request, Response $response, array $args): Response {
+        $this->container->get('eloquent');
+
+        $offset = filter_var($args['offset'] ?? 0, FILTER_VALIDATE_INT);
+        $limit = filter_var($args['limit'] ?? 20, FILTER_VALIDATE_INT);
+
+        if ($offset === false || $offset < 0 || $limit === false || $limit < 1 || $limit > 100) {
+            return $this->json($response, [
+                'error' => 'El offset debe ser mayor o igual a 0 y el límite debe estar entre 1 y 100.'],
+                422);
+        }
+
+        $params = $request->getQueryParams();
+        $tipoHabitacionId = filter_var($params['tipo_habitacion_id'] ?? '', FILTER_VALIDATE_INT);
+        $tipo = trim((string) ($params['tipo'] ?? ''));
+        $servicioHabitacionId = filter_var($params['servicio_habitacion_id'] ?? '', FILTER_VALIDATE_INT);
+        $servicio = trim((string) ($params['servicio'] ?? ''));
+
+        $query = ServicioIncluidoModel::query()
+            ->select([
+                'servicios_incluidos.tipo_habitacion_id',
+                'tipos_habitacion.nombre as tipo_habitacion_nombre',
+                'servicios_incluidos.servicio_habitacion_id',
+                'servicios_habitacion.nombre as servicio_habitacion_nombre'
+            ])
+            ->join('tipos_habitacion', 'servicios_incluidos.tipo_habitacion_id', '=', 'tipos_habitacion.id')
+            ->join('servicios_habitacion', 'servicios_incluidos.servicio_habitacion_id', '=', 'servicios_habitacion.id');
+
+        if ($tipoHabitacionId !== false) {
+            $query->where('servicios_incluidos.tipo_habitacion_id', $tipoHabitacionId);
+        }
+        if ($tipo !== '') {
+            $query->where('tipos_habitacion.nombre', 'like', "%{$tipo}%");
+        }
+        if ($servicioHabitacionId !== false) {
+            $query->where('servicios_incluidos.servicio_habitacion_id', $servicioHabitacionId);
+        }
+        if ($servicio !== '') {
+            $query->where('servicios_habitacion.nombre', 'like', "%{$servicio}%");
+        }
+
+        $total = (clone $query)->count('servicios_incluidos.tipo_habitacion_id');
+
+        $serviciosIncluidos = $query
+            ->orderBy('tipos_habitacion.nombre')
+            ->offset($offset)
+            ->limit($limit)
+            ->get()
+            ->toArray();
+
+        return $this->json($response, [
+            'data' => $serviciosIncluidos,
+            'pagination' => [
+                'offset' => $offset,
+                'limit' => $limit,
+                'total' => $total
+            ]
+        ], 200);
+    }
  
  
     private function json(Response $response, array $payload, int $status): Response{

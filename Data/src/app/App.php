@@ -12,6 +12,7 @@ $dotenv->load();
 AppFactory::setContainer($container);
 $app = AppFactory::create();
 $app->addBodyParsingMiddleware();
+$app->addErrorMiddleware(true, true, true);
 
 require_once "routes.php";
 require_once "config.php";
