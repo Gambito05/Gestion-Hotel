@@ -69,10 +69,12 @@ CREATE TABLE usuarios (
   nombre         VARCHAR(80)   NOT NULL,
   apellidos      VARCHAR(120)  NOT NULL,
   email          VARCHAR(150)  NOT NULL,
+  username       VARCHAR(50)   NULL,
   password_hash  VARCHAR(255)  NOT NULL,
   telefono       VARCHAR(20)   NULL,
   activo         BOOLEAN       NOT NULL DEFAULT 1,
   CONSTRAINT uq_usuarios_email UNIQUE (email),
+  CONSTRAINT uq_usuarios_username UNIQUE (username),
   CONSTRAINT fk_usuarios_rol FOREIGN KEY (rol_id)
     REFERENCES roles (id) ON DELETE RESTRICT ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -208,6 +210,5 @@ CREATE TABLE pagos (
 USE gestion_hotel;
 
 INSERT INTO roles(nombre) VALUES ('Admin');
-INSERT INTO roles(nombre) VALUES ('Médico');
-INSERT INTO roles(nombre) VALUES ('Paciente');
-
+INSERT INTO roles(nombre) VALUES ('Recepcionista');
+INSERT INTO roles(nombre) VALUES ('Cliente');
