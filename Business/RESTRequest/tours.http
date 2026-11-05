@@ -1,0 +1,123 @@
+@host = http://localhost:9090/api
+@uri = {{host}}/tours
+@token = PEGAR_AQUI_EL_TOKEN_DEL_LOGIN
+
+### Listar todos
+GET {{uri}}
+Authorization: Bearer {{token}}
+
+### Obtener por id
+GET {{uri}}/1
+Authorization: Bearer {{token}}
+
+### Registro que no existe (404)
+GET {{uri}}/9999
+Authorization: Bearer {{token}}
+
+### Filtrar primera página de 10
+GET {{uri}}/filter/0/10?nombre=volc
+Authorization: Bearer {{token}}
+
+### Filtrar segunda página de 5
+GET {{uri}}/filter/5/5?nombre=volc
+Authorization: Bearer {{token}}
+
+### Filtrar con límite mayor a 100 (422)
+GET {{uri}}/filter/0/500?nombre=volc
+Authorization: Bearer {{token}}
+
+### Filtrar con offset negativo (422)
+GET {{uri}}/filter/-1/10?nombre=volc
+Authorization: Bearer {{token}}
+
+### Insertar con JSON inválido (400)
+POST {{uri}}
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+
+
+### Insertar tour válido
+POST {{uri}}
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "nombre": "Río Celeste",
+    "descripcion": "Caminata al río y la catarata",
+    "duracion_horas": 6,
+    "precio_persona": 40000,
+    "cupo_maximo": 12,
+    "punto_encuentro": "Recepción del hotel",
+    "latitud": 10.701,
+    "longitud": -85.019,
+    "foto_url": "https://ejemplo.com/rio-celeste.jpg"
+}
+
+### Insertar con duración 0 (400)
+POST {{uri}}
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "nombre": "Río Celeste",
+    "duracion_horas": 0,
+    "precio_persona": 40000,
+    "cupo_maximo": 12,
+    "punto_encuentro": "Recepción"
+}
+
+### Insertar con cupo decimal (400)
+POST {{uri}}
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "nombre": "Río Celeste",
+    "duracion_horas": 6,
+    "precio_persona": 40000,
+    "cupo_maximo": 12.5,
+    "punto_encuentro": "Recepción"
+}
+
+### Insertar con latitud fuera de rango (400)
+POST {{uri}}
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "nombre": "Río Celeste",
+    "duracion_horas": 6,
+    "precio_persona": 40000,
+    "cupo_maximo": 12,
+    "punto_encuentro": "Recepción",
+    "latitud": 120
+}
+
+### Insertar con URL de foto inválida (400)
+POST {{uri}}
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "nombre": "Río Celeste",
+    "duracion_horas": 6,
+    "precio_persona": 40000,
+    "cupo_maximo": 12,
+    "punto_encuentro": "Recepción",
+    "foto_url": "ftp://ejemplo.com/foto.jpg"
+}
+
+### Insertar sin punto de encuentro (400)
+POST {{uri}}
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "nombre": "Río Celeste",
+    "duracion_horas": 6,
+    "precio_persona": 40000,
+    "cupo_maximo": 12
+}
+
+###

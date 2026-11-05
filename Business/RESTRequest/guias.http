@@ -1,0 +1,69 @@
+@host = http://localhost:9090/api
+@uri = {{host}}/guias
+@token = PEGAR_AQUI_EL_TOKEN_DEL_LOGIN
+
+### Listar todos
+GET {{uri}}
+Authorization: Bearer {{token}}
+
+### Obtener por id
+GET {{uri}}/1
+Authorization: Bearer {{token}}
+
+### Registro que no existe (404)
+GET {{uri}}/9999
+Authorization: Bearer {{token}}
+
+### Filtrar primera página de 10
+GET {{uri}}/filter/0/10?nombre=ana
+Authorization: Bearer {{token}}
+
+### Filtrar segunda página de 5
+GET {{uri}}/filter/5/5?nombre=ana
+Authorization: Bearer {{token}}
+
+### Filtrar con límite mayor a 100 (422)
+GET {{uri}}/filter/0/500?nombre=ana
+Authorization: Bearer {{token}}
+
+### Filtrar con offset negativo (422)
+GET {{uri}}/filter/-1/10?nombre=ana
+Authorization: Bearer {{token}}
+
+### Insertar con JSON inválido (400)
+POST {{uri}}
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+
+
+### Insertar guía válido
+POST {{uri}}
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "nombre": "Luis Herrera",
+    "telefono": "8555-1234"
+}
+
+### Insertar con nombre con números (400)
+POST {{uri}}
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "nombre": "Luis 2"
+}
+
+### Insertar con teléfono sin guión (400)
+POST {{uri}}
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "nombre": "Luis Herrera",
+    "telefono": "85551234"
+}
+
+###

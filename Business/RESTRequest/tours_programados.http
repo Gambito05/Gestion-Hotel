@@ -1,0 +1,97 @@
+@host = http://localhost:9090/api
+@uri = {{host}}/tours-programados
+@token = PEGAR_AQUI_EL_TOKEN_DEL_LOGIN
+
+### Listar todos
+GET {{uri}}
+Authorization: Bearer {{token}}
+
+### Obtener por id
+GET {{uri}}/1
+Authorization: Bearer {{token}}
+
+### Registro que no existe (404)
+GET {{uri}}/9999
+Authorization: Bearer {{token}}
+
+### Filtrar primera página de 10
+GET {{uri}}/filter/0/10?tour_id=1&estado=&fecha=
+Authorization: Bearer {{token}}
+
+### Filtrar segunda página de 5
+GET {{uri}}/filter/5/5?tour_id=1&estado=&fecha=
+Authorization: Bearer {{token}}
+
+### Filtrar con límite mayor a 100 (422)
+GET {{uri}}/filter/0/500?tour_id=1&estado=&fecha=
+Authorization: Bearer {{token}}
+
+### Filtrar con offset negativo (422)
+GET {{uri}}/filter/-1/10?tour_id=1&estado=&fecha=
+Authorization: Bearer {{token}}
+
+### Insertar con JSON inválido (400)
+POST {{uri}}
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+
+
+### Programar tour válido
+POST {{uri}}
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "tour_id": 2,
+    "guia_id": 2,
+    "fecha_hora_inicio": "2026-12-27 09:00:00",
+    "cupo": 10
+}
+
+### Insertar con fecha sin hora (400)
+POST {{uri}}
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "tour_id": 2,
+    "fecha_hora_inicio": "2026-12-27",
+    "cupo": 10
+}
+
+### Insertar con fecha en otro formato (400)
+POST {{uri}}
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "tour_id": 2,
+    "fecha_hora_inicio": "27/12/2026 09:00",
+    "cupo": 10
+}
+
+### Insertar con un estado que no existe (400)
+POST {{uri}}
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "tour_id": 2,
+    "fecha_hora_inicio": "2026-12-27 09:00:00",
+    "cupo": 10,
+    "estado": "LLENO"
+}
+
+### Insertar con cupo 0 (400)
+POST {{uri}}
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "tour_id": 2,
+    "fecha_hora_inicio": "2026-12-27 09:00:00",
+    "cupo": 0
+}
+
+###

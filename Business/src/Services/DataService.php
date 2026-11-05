@@ -24,10 +24,10 @@ final class DataService {
             ['query' => $query]);
     }
 
-    /* public function filter(string $path, array $query= []) : ResponseInterface{ 
+    public function filter(string $path, array $query= []) : ResponseInterface{ 
         return $this->client->request('GET', ltrim($path, '/'),
             ['query' => $query]);
-    } */
+    }
 
     public function post(string $path, string $body) : ResponseInterface{
         return $this->client->request('POST', ltrim($path, '/'),

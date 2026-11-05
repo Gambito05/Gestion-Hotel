@@ -1,0 +1,96 @@
+@host = http://localhost:9090/api
+@uri = {{host}}/reservas-tour
+@token = PEGAR_AQUI_EL_TOKEN_DEL_LOGIN
+
+### Listar todos
+GET {{uri}}
+Authorization: Bearer {{token}}
+
+### Obtener por id
+GET {{uri}}/1
+Authorization: Bearer {{token}}
+
+### Registro que no existe (404)
+GET {{uri}}/9999
+Authorization: Bearer {{token}}
+
+### Filtrar primera página de 10
+GET {{uri}}/filter/0/10?codigo=RT&estado=&cliente_id=
+Authorization: Bearer {{token}}
+
+### Filtrar segunda página de 5
+GET {{uri}}/filter/5/5?codigo=RT&estado=&cliente_id=
+Authorization: Bearer {{token}}
+
+### Filtrar con límite mayor a 100 (422)
+GET {{uri}}/filter/0/500?codigo=RT&estado=&cliente_id=
+Authorization: Bearer {{token}}
+
+### Filtrar con offset negativo (422)
+GET {{uri}}/filter/-1/10?codigo=RT&estado=&cliente_id=
+Authorization: Bearer {{token}}
+
+### Insertar con JSON inválido (400)
+POST {{uri}}
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+
+
+### Insertar reserva de tour válida
+POST {{uri}}
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "codigo": "RT-0004",
+    "tour_programado_id": 3,
+    "cliente_id": 4,
+    "personas": 2,
+    "precio_persona": 20000,
+    "total": 40000
+}
+
+### Insertar con código de habitación RH- (400)
+POST {{uri}}
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "codigo": "RH-0004",
+    "tour_programado_id": 3,
+    "cliente_id": 4,
+    "personas": 2,
+    "precio_persona": 20000,
+    "total": 40000
+}
+
+### Insertar con personas fuera de rango (400)
+POST {{uri}}
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "codigo": "RT-0005",
+    "tour_programado_id": 3,
+    "cliente_id": 4,
+    "personas": 300,
+    "precio_persona": 20000,
+    "total": 40000
+}
+
+### Insertar con total en texto (400)
+POST {{uri}}
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "codigo": "RT-0005",
+    "tour_programado_id": 3,
+    "cliente_id": 4,
+    "personas": 2,
+    "precio_persona": 20000,
+    "total": "cuarenta mil"
+}
+
+###

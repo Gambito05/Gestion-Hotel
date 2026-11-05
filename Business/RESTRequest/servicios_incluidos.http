@@ -1,0 +1,56 @@
+@host = http://localhost:9090/api
+@uri = {{host}}/servicios-incluidos
+@token = PEGAR_AQUI_EL_TOKEN_DEL_LOGIN
+
+### Listar servicios incluidos
+GET {{uri}}
+Authorization: Bearer {{token}}
+
+### Insertar con JSON inválido (400)
+POST {{uri}}
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+
+
+### Familiar incluye Aire acondicionado
+POST {{uri}}
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "tipo_habitacion_id": 3,
+    "servicio_habitacion_id": 2
+}
+
+### Insertar con ids en 0 (400)
+POST {{uri}}
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "tipo_habitacion_id": 0,
+    "servicio_habitacion_id": 0
+}
+
+### Insertar con ids no numéricos (400)
+POST {{uri}}
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "tipo_habitacion_id": "suite",
+    "servicio_habitacion_id": "wifi"
+}
+
+### Insertar pareja repetida (409 desde datos)
+POST {{uri}}
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "tipo_habitacion_id": 2,
+    "servicio_habitacion_id": 3
+}
+
+###

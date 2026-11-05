@@ -1,0 +1,67 @@
+@host = http://localhost:9090/api
+@uri = {{host}}/idiomas
+@token = PEGAR_AQUI_EL_TOKEN_DEL_LOGIN
+
+### Listar todos
+GET {{uri}}
+Authorization: Bearer {{token}}
+
+### Obtener por id
+GET {{uri}}/1
+Authorization: Bearer {{token}}
+
+### Registro que no existe (404)
+GET {{uri}}/9999
+Authorization: Bearer {{token}}
+
+### Filtrar primera página de 10
+GET {{uri}}/filter/0/10?nombre=
+Authorization: Bearer {{token}}
+
+### Filtrar segunda página de 5
+GET {{uri}}/filter/5/5?nombre=
+Authorization: Bearer {{token}}
+
+### Filtrar con límite mayor a 100 (422)
+GET {{uri}}/filter/0/500?nombre=
+Authorization: Bearer {{token}}
+
+### Filtrar con offset negativo (422)
+GET {{uri}}/filter/-1/10?nombre=
+Authorization: Bearer {{token}}
+
+### Insertar con JSON inválido (400)
+POST {{uri}}
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+
+
+### Insertar idioma válido
+POST {{uri}}
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "nombre": "Italiano"
+}
+
+### Insertar con números (400)
+POST {{uri}}
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "nombre": "Inglés 2"
+}
+
+### Insertar con nombre de 2 caracteres (400)
+POST {{uri}}
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "nombre": "EN"
+}
+
+###

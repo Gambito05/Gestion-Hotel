@@ -1,0 +1,117 @@
+@host = http://localhost:9090/api
+@uri = {{host}}/tipos-habitacion
+@token = PEGAR_AQUI_EL_TOKEN_DEL_LOGIN
+
+### Listar todos
+GET {{uri}}
+Authorization: Bearer {{token}}
+
+### Obtener por id
+GET {{uri}}/2
+Authorization: Bearer {{token}}
+
+### Registro que no existe (404)
+GET {{uri}}/9999
+Authorization: Bearer {{token}}
+
+### Filtrar primera página de 10
+GET {{uri}}/filter/0/10?nombre=sui
+Authorization: Bearer {{token}}
+
+### Filtrar segunda página de 5
+GET {{uri}}/filter/5/5?nombre=sui
+Authorization: Bearer {{token}}
+
+### Filtrar con límite mayor a 100 (422)
+GET {{uri}}/filter/0/500?nombre=sui
+Authorization: Bearer {{token}}
+
+### Filtrar con offset negativo (422)
+GET {{uri}}/filter/-1/10?nombre=sui
+Authorization: Bearer {{token}}
+
+### Insertar con JSON inválido (400)
+POST {{uri}}
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+
+
+### Insertar tipo válido
+POST {{uri}}
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "nombre": "Junior Suite",
+    "descripcion": "Suite pequeña con balcón",
+    "capacidad": 2,
+    "precio_noche": 65000
+}
+
+### Insertar con nombre con números (400)
+POST {{uri}}
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "nombre": "Suite 2",
+    "capacidad": 2,
+    "precio_noche": 65000
+}
+
+### Insertar con capacidad 0 (400)
+POST {{uri}}
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "nombre": "Doble",
+    "capacidad": 0,
+    "precio_noche": 45000
+}
+
+### Insertar con capacidad decimal (400)
+POST {{uri}}
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "nombre": "Doble",
+    "capacidad": 2.5,
+    "precio_noche": 45000
+}
+
+### Insertar con precio negativo (400)
+POST {{uri}}
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "nombre": "Doble",
+    "capacidad": 2,
+    "precio_noche": -45000
+}
+
+### Insertar con activo igual a 2 (400)
+POST {{uri}}
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "nombre": "Doble",
+    "capacidad": 2,
+    "precio_noche": 45000,
+    "activo": 2
+}
+
+### Actualizar precio
+PUT {{uri}}/1
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "precio_noche": 38000
+}
+
+###
