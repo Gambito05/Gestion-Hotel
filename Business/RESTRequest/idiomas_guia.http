@@ -1,0 +1,46 @@
+@host = http://localhost:9090/api
+@uri = {{host}}/idiomas-guia
+@token = PEGAR_AQUI_EL_TOKEN_DEL_LOGIN
+
+### Listar idiomas de los guías
+GET {{uri}}
+Authorization: Bearer {{token}}
+
+### Insertar con JSON inválido (400)
+POST {{uri}}
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+
+
+### Ana habla Inglés
+POST {{uri}}
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "guia_id": 2,
+    "idioma_id": 2
+}
+
+### Insertar con ids negativos (400)
+POST {{uri}}
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "guia_id": -1,
+    "idioma_id": -2
+}
+
+### Insertar con un idioma que no existe (422 desde datos)
+POST {{uri}}
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "guia_id": 1,
+    "idioma_id": 9999
+}
+
+###

@@ -1,0 +1,133 @@
+@host = http://localhost:9090/api
+@uri = {{host}}/pagos
+@token = PEGAR_AQUI_EL_TOKEN_DEL_LOGIN
+
+### Listar todos
+GET {{uri}}
+Authorization: Bearer {{token}}
+
+### Obtener por id
+GET {{uri}}/1
+Authorization: Bearer {{token}}
+
+### Registro que no existe (404)
+GET {{uri}}/9999
+Authorization: Bearer {{token}}
+
+### Filtrar primera página de 10
+GET {{uri}}/filter/0/10?metodo=SINPE&referencia=
+Authorization: Bearer {{token}}
+
+### Filtrar segunda página de 5
+GET {{uri}}/filter/5/5?metodo=SINPE&referencia=
+Authorization: Bearer {{token}}
+
+### Filtrar con límite mayor a 100 (422)
+GET {{uri}}/filter/0/500?metodo=SINPE&referencia=
+Authorization: Bearer {{token}}
+
+### Filtrar con offset negativo (422)
+GET {{uri}}/filter/-1/10?metodo=SINPE&referencia=
+Authorization: Bearer {{token}}
+
+### Insertar con JSON inválido (400)
+POST {{uri}}
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+
+
+### Insertar pago válido
+POST {{uri}}
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "reserva_tour_id": 2,
+    "registrado_por": 2,
+    "monto": 76000,
+    "metodo": "SINPE",
+    "referencia": "2026122000112233",
+    "pagado_at": "2026-12-20 08:45:00"
+}
+
+### Insertar con método que no existe (400)
+POST {{uri}}
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "reserva_tour_id": 2,
+    "registrado_por": 2,
+    "monto": 5000,
+    "metodo": "CHEQUE",
+    "pagado_at": "2026-12-20 08:45:00"
+}
+
+### Insertar con moneda EUR (400)
+POST {{uri}}
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "reserva_tour_id": 2,
+    "registrado_por": 2,
+    "monto": 50,
+    "moneda": "EUR",
+    "metodo": "TARJETA",
+    "referencia": "AUT-111111",
+    "pagado_at": "2026-12-20 08:45:00"
+}
+
+### Insertar con referencia con espacios (400)
+POST {{uri}}
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "reserva_tour_id": 2,
+    "registrado_por": 2,
+    "monto": 5000,
+    "metodo": "TARJETA",
+    "referencia": "AUT 111111",
+    "pagado_at": "2026-12-20 08:45:00"
+}
+
+### Insertar con monto 0 (400)
+POST {{uri}}
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "reserva_tour_id": 2,
+    "registrado_por": 2,
+    "monto": 0,
+    "metodo": "EFECTIVO",
+    "pagado_at": "2026-12-20 08:45:00"
+}
+
+### Insertar sin fecha de pago (400)
+POST {{uri}}
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "reserva_tour_id": 2,
+    "registrado_por": 2,
+    "monto": 5000,
+    "metodo": "EFECTIVO"
+}
+
+### Insertar sin ninguna reserva (422 desde datos)
+POST {{uri}}
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "registrado_por": 2,
+    "monto": 5000,
+    "metodo": "EFECTIVO",
+    "pagado_at": "2026-12-20 08:45:00"
+}
+
+###

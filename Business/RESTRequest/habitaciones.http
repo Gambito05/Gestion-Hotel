@@ -1,0 +1,105 @@
+@host = http://localhost:9090/api
+@uri = {{host}}/habitaciones
+@token = PEGAR_AQUI_EL_TOKEN_DEL_LOGIN
+
+### Listar todos
+GET {{uri}}
+Authorization: Bearer {{token}}
+
+### Obtener por id
+GET {{uri}}/3
+Authorization: Bearer {{token}}
+
+### Registro que no existe (404)
+GET {{uri}}/9999
+Authorization: Bearer {{token}}
+
+### Filtrar primera página de 10
+GET {{uri}}/filter/0/10?numero=&estado=DISPONIBLE&tipo_habitacion_id=
+Authorization: Bearer {{token}}
+
+### Filtrar segunda página de 5
+GET {{uri}}/filter/5/5?numero=&estado=DISPONIBLE&tipo_habitacion_id=
+Authorization: Bearer {{token}}
+
+### Filtrar con límite mayor a 100 (422)
+GET {{uri}}/filter/0/500?numero=&estado=DISPONIBLE&tipo_habitacion_id=
+Authorization: Bearer {{token}}
+
+### Filtrar con offset negativo (422)
+GET {{uri}}/filter/-1/10?numero=&estado=DISPONIBLE&tipo_habitacion_id=
+Authorization: Bearer {{token}}
+
+### Insertar con JSON inválido (400)
+POST {{uri}}
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+
+
+### Insertar habitación válida
+POST {{uri}}
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "tipo_habitacion_id": 1,
+    "numero": "103",
+    "piso": 1
+}
+
+### Insertar con número en minúsculas (400)
+POST {{uri}}
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "tipo_habitacion_id": 1,
+    "numero": "a103",
+    "piso": 1
+}
+
+### Insertar con piso fuera de rango (400)
+POST {{uri}}
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "tipo_habitacion_id": 1,
+    "numero": "104",
+    "piso": 500
+}
+
+### Insertar con un estado que no existe (400)
+POST {{uri}}
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "tipo_habitacion_id": 1,
+    "numero": "104",
+    "piso": 1,
+    "estado": "OCUPADA"
+}
+
+### Insertar con un tipo que no existe (422 desde datos)
+POST {{uri}}
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "tipo_habitacion_id": 9999,
+    "numero": "104",
+    "piso": 1
+}
+
+### Poner habitación en mantenimiento
+PUT {{uri}}/2
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "estado": "MANTENIMIENTO"
+}
+
+###

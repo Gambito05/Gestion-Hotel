@@ -1,0 +1,54 @@
+@host = http://localhost:9090/api
+
+### Login del administrador (copiar el token en los demás archivos)
+POST {{host}}/auth/login
+Content-Type: application/json
+
+{
+    "email": "admin@hotel.com",
+    "password": "Clave123*"
+}
+
+### Login de la recepcionista
+POST {{host}}/auth/login
+Content-Type: application/json
+
+{
+    "email": "recepcion@hotel.com",
+    "password": "Clave123*"
+}
+
+### Login con contraseña incorrecta (401)
+POST {{host}}/auth/login
+Content-Type: application/json
+
+{
+    "email": "admin@hotel.com",
+    "password": "OtraClave1*"
+}
+
+### Login con email que no existe (401)
+POST {{host}}/auth/login
+Content-Type: application/json
+
+{
+    "email": "nadie@hotel.com",
+    "password": "Clave123*"
+}
+
+### Login sin datos (422)
+POST {{host}}/auth/login
+Content-Type: application/json
+
+{
+    "email": "",
+    "password": ""
+}
+
+### Consultar sin token (401)
+GET {{host}}/roles
+
+### Cerrar sesión del usuario 1
+DELETE {{host}}/auth/loggout/1
+
+###

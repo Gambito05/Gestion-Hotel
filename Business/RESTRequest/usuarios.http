@@ -1,0 +1,182 @@
+@host = http://localhost:9090/api
+@uri = {{host}}/usuarios
+@token = PEGAR_AQUI_EL_TOKEN_DEL_LOGIN
+
+### Listar todos
+GET {{uri}}
+Authorization: Bearer {{token}}
+
+### Obtener por id
+GET {{uri}}/3
+Authorization: Bearer {{token}}
+
+### Registro que no existe (404)
+GET {{uri}}/9999
+Authorization: Bearer {{token}}
+
+### Filtrar primera página de 10
+GET {{uri}}/filter/0/10?nombre=&email=&rol_id=3
+Authorization: Bearer {{token}}
+
+### Filtrar segunda página de 5
+GET {{uri}}/filter/5/5?nombre=&email=&rol_id=3
+Authorization: Bearer {{token}}
+
+### Filtrar con límite mayor a 100 (422)
+GET {{uri}}/filter/0/500?nombre=&email=&rol_id=3
+Authorization: Bearer {{token}}
+
+### Filtrar con offset negativo (422)
+GET {{uri}}/filter/-1/10?nombre=&email=&rol_id=3
+Authorization: Bearer {{token}}
+
+### Insertar con JSON inválido (400)
+POST {{uri}}
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+
+
+### Insertar cliente válido
+POST {{uri}}
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "rol_id": 3,
+    "nombre": "Sofía",
+    "apellidos": "Brenes Araya",
+    "email": "sofia@correo.com",
+    "password": "Sofia2026*",
+    "telefono": "8123-4567"
+}
+
+### Insertar cliente sin teléfono
+POST {{uri}}
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "rol_id": 3,
+    "nombre": "Andrés",
+    "apellidos": "Solano Mora",
+    "email": "andres@correo.com",
+    "password": "Andres2026@"
+}
+
+### Insertar con nombre con números (400)
+POST {{uri}}
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "rol_id": 3,
+    "nombre": "Sofía2",
+    "apellidos": "Brenes",
+    "email": "otra@correo.com",
+    "password": "Sofia2026*"
+}
+
+### Insertar con email sin formato válido (400)
+POST {{uri}}
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "rol_id": 3,
+    "nombre": "Sofía",
+    "apellidos": "Brenes",
+    "email": "sofia.correo.com",
+    "password": "Sofia2026*"
+}
+
+### Insertar con contraseña sin mayúscula ni símbolo (400)
+POST {{uri}}
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "rol_id": 3,
+    "nombre": "Sofía",
+    "apellidos": "Brenes",
+    "email": "otra@correo.com",
+    "password": "sofia2026"
+}
+
+### Insertar con teléfono sin guión (400)
+POST {{uri}}
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "rol_id": 3,
+    "nombre": "Sofía",
+    "apellidos": "Brenes",
+    "email": "otra@correo.com",
+    "password": "Sofia2026*",
+    "telefono": "81234567"
+}
+
+### Insertar con teléfono que inicia con 9 (400)
+POST {{uri}}
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "rol_id": 3,
+    "nombre": "Sofía",
+    "apellidos": "Brenes",
+    "email": "otra@correo.com",
+    "password": "Sofia2026*",
+    "telefono": "9123-4567"
+}
+
+### Insertar con rol no numérico (400)
+POST {{uri}}
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "rol_id": "cliente",
+    "nombre": "Sofía",
+    "apellidos": "Brenes",
+    "email": "otra@correo.com",
+    "password": "Sofia2026*"
+}
+
+### Insertar con varios campos inválidos a la vez (400)
+POST {{uri}}
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "rol_id": 0,
+    "nombre": "",
+    "apellidos": "B",
+    "email": "x",
+    "password": "123"
+}
+
+### Insertar con email repetido (409 desde datos)
+POST {{uri}}
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "rol_id": 3,
+    "nombre": "Laura",
+    "apellidos": "Mora",
+    "email": "laura@correo.com",
+    "password": "Laura2026*"
+}
+
+### Actualizar teléfono
+PUT {{uri}}/4
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "telefono": "8999-0000"
+}
+
+###
