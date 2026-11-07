@@ -17,7 +17,7 @@ class UsuarioModel extends Model {
         'apellidos',
         'email',
         'username',
-        'password_hash',
+        'password',
         'telefono',
         'activo',
     ];

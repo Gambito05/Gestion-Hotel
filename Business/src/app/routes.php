@@ -9,7 +9,6 @@ use Slim\Routing\RouteCollectorProxy;
 $app->group('/api', function(RouteCollectorProxy $api) {
     $api->group('/auth', function(RouteCollectorProxy $endpoint) {
         $endpoint->post('/login', Auth::class . ':login');
-        $endpoint->delete('/loggout/{id}', Auth::class . ':loggout');
     });
     $api->group('/roles', function(RouteCollectorProxy $endpoint) {
         $endpoint->get('[/{id}]',Rol::class . ':read');

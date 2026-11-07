@@ -32,7 +32,7 @@ require_once "config.php";
 $app->add(new JwtAuthentication(
     new Options(isSecure: false),
     new FirebaseDecoder(new Secret($_ENV['KEY'], 'HS256')),
-    [new RequestPathRule(['/'], ['/api/auth/login', '/api/auth/loggout'])],
+    [new RequestPathRule(['/'], ['/api/auth/login'])],
 ));
 
 $errorMiddleware = $app->addErrorMiddleware(true,true,true);
@@ -45,7 +45,7 @@ $errorMiddleware->setErrorHandler(AuthorizationException::class,
         return $response->withHeader('Content-Type', 'application/json; charset=utf-8');
     }
 );
-$app->add(function (ServerRequestInterface $request, RequestHandlerInterface $handler) use ($app): ResponseInterface {
+$app->add(function (Request $request, RequestHandler $handler) use ($app): Response {
 	$origin = $request->getHeaderLine('Origin');
 	$allowedOrigin = $_ENV['CORS_ALLOWED_ORIGIN'] ?? 'http://localhost:4200';
 

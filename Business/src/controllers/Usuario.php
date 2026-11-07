@@ -49,6 +49,7 @@ class Usuario {
             $query = [
                 'nombre' => trim((string) ($params['nombre'] ?? '')),
                 'email' => trim((string) ($params['email'] ?? '')),
+                'username' => trim((string) ($params['username'] ?? '')),
                 'rol_id' => trim((string) ($params['rol_id'] ?? ''))
             ];
 
@@ -99,7 +100,20 @@ class Usuario {
 
     public function update(Request $request, Response $response, array $args): Response {
         try {
+            $data = $request->getParsedBody();
+            if (is_array($data) && array_key_exists('username', $data)) {
+                $username = trim((string) $data['username']);
+                if (!preg_match('/^[a-z0-9]{8,16}$/', $username)) {
+                    return $this->json($response, [
+                        'errors' => [
+                            'username' => 'El username debe tener entre 8 y 16 caracteres, usando solo minúsculas y números.',
+                        ],
+                    ], 400);
+                }
+            }
+
             $dataservice = $this->container->get(DataService::class);
+            $request->getBody()->rewind();
             $body = (string) $request->getBody();
             $upstream = $dataservice->put('usuarios/' . rawurlencode($args['id']), $body);
 

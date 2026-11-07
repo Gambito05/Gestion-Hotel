@@ -1,12 +1,21 @@
 @host = http://localhost:9090/api
 
-### Login del administrador (copiar el token en los demás archivos)
+### Login del administrador
 POST {{host}}/auth/login
 Content-Type: application/json
 
 {
-    "email": "admin@hotel.com",
-    "password": "Clave123*"
+    "email": "bryan@hotel.com",
+    "password": "Bryan13$"
+}
+
+### Login del administrador usando username
+POST {{host}}/auth/login
+Content-Type: application/json
+
+{
+    "username": "adminbryan",
+    "password": "Bryan13$"
 }
 
 ### Login de la recepcionista
@@ -47,8 +56,3 @@ Content-Type: application/json
 
 ### Consultar sin token (401)
 GET {{host}}/roles
-
-### Cerrar sesión del usuario 1
-DELETE {{host}}/auth/loggout/1
-
-###

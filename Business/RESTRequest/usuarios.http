@@ -1,6 +1,6 @@
 @host = http://localhost:9090/api
 @uri = {{host}}/usuarios
-@token = PEGAR_AQUI_EL_TOKEN_DEL_LOGIN
+@token = eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJnZXN0aW9uLWhvdGVsLWJ1c2luZXNzIiwiaWF0IjoxNzk0MDg3OTUyLCJleHAiOjE3OTQwOTE1NTIsInN1YiI6IjEiLCJ1c2VybmFtZSI6ImFkbWluYnJ5YW4iLCJlbWFpbCI6ImJyeWFuQGhvdGVsLmNvbSIsInJvbF9pZCI6MX0.E4aW5De6cy5TvNBucjEoCgmHU1tkk9FMyJsttJMUT84
 
 ### Listar todos
 GET {{uri}}
@@ -15,19 +15,22 @@ GET {{uri}}/9999
 Authorization: Bearer {{token}}
 
 ### Filtrar primera página de 10
-GET {{uri}}/filter/0/10?nombre=&email=&rol_id=3
+GET {{uri}}/filter/0/10?nombre=&email=&username=&rol_id=3
 Authorization: Bearer {{token}}
 
 ### Filtrar segunda página de 5
-GET {{uri}}/filter/5/5?nombre=&email=&rol_id=3
+GET {{uri}}/filter/5/5?nombre=&email=&username=&rol_id=3
 Authorization: Bearer {{token}}
 
 ### Filtrar con límite mayor a 100 (422)
-GET {{uri}}/filter/0/500?nombre=&email=&rol_id=3
+GET {{uri}}/filter/0/500?nombre=&email=&username=&rol_id=3
 Authorization: Bearer {{token}}
 
 ### Filtrar con offset negativo (422)
-GET {{uri}}/filter/-1/10?nombre=&email=&rol_id=3
+GET {{uri}}/filter/-1/10?nombre=&email=&username=&rol_id=3
+
+### Filtrar por username
+GET {{uri}}/filter/0/10?username=sofia
 Authorization: Bearer {{token}}
 
 ### Insertar con JSON inválido (400)
@@ -46,7 +49,8 @@ Authorization: Bearer {{token}}
     "rol_id": 3,
     "nombre": "Sofía",
     "apellidos": "Brenes Araya",
-    "email": "sofia@correo.com",
+    "email": "sofia@gmail.com",
+    "username": "sofiabrenes",
     "password": "Sofia2026*",
     "telefono": "8123-4567"
 }
@@ -61,6 +65,7 @@ Authorization: Bearer {{token}}
     "nombre": "Andrés",
     "apellidos": "Solano Mora",
     "email": "andres@correo.com",
+    "username": "andressolano",
     "password": "Andres2026@"
 }
 
@@ -177,6 +182,24 @@ Authorization: Bearer {{token}}
 
 {
     "telefono": "8999-0000"
+}
+
+### Actualizar username
+PUT {{uri}}/4
+Content-Type: application/json
+Authorization: ******
+
+{
+    "username": "lauramora2"
+}
+
+### Actualizar username inválido (400)
+PUT {{uri}}/4
+Content-Type: application/json
+Authorization: ******
+
+{
+    "username": "Laura"
 }
 
 ###

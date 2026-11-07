@@ -9,8 +9,9 @@ Content-Type: application/json
     "rol_id": 1,
     "nombre": "Bryan",
     "apellidos": "Mendez Lara",
-    "email": "admin@hotel.com",
-    "password_hash": "$2y$10$q0ODEJXIzDy3J9Ck9LcOyuMJVf.Kxx4t0M/K9JDUCOC35aKw8kqga",
+    "email": "bryan@hotel.com",
+    "username": "adminbryan",
+    "password": "Bryan13$",
     "telefono": "8899-1122"
 }
 
@@ -23,7 +24,8 @@ Content-Type: application/json
     "nombre": "María",
     "apellidos": "Rodríguez Solís",
     "email": "recepcion@hotel.com",
-    "password_hash": "$2y$10$q0ODEJXIzDy3J9Ck9LcOyuMJVf.Kxx4t0M/K9JDUCOC35aKw8kqga",
+    "username": "recepcion1",
+    "password": "Clave123*",
     "telefono": "8888-2222"
 }
 
@@ -36,7 +38,8 @@ Content-Type: application/json
     "nombre": "Laura",
     "apellidos": "Mora Castro",
     "email": "laura@correo.com",
-    "password_hash": "$2y$10$q0ODEJXIzDy3J9Ck9LcOyuMJVf.Kxx4t0M/K9JDUCOC35aKw8kqga",
+    "username": "lauramora",
+    "password": "Clave123*",
     "telefono": "8888-3333"
 }
 
@@ -49,7 +52,8 @@ Content-Type: application/json
     "nombre": "Carlos",
     "apellidos": "Vargas Quesada",
     "email": "carlos@correo.com",
-    "password_hash": "$2y$10$q0ODEJXIzDy3J9Ck9LcOyuMJVf.Kxx4t0M/K9JDUCOC35aKw8kqga"
+    "username": "carlos123",
+    "password": "Clave123*"
 }
 
 ### Insertar usuario temporal (se elimina al final)
@@ -61,7 +65,8 @@ Content-Type: application/json
     "nombre": "Temporal",
     "apellidos": "De Prueba",
     "email": "temporal@correo.com",
-    "password_hash": "$2y$10$q0ODEJXIzDy3J9Ck9LcOyuMJVf.Kxx4t0M/K9JDUCOC35aKw8kqga"
+    "username": "temporal1",
+    "password": "Clave123*"
 }
 
 ### Insertar con campos vacíos (422)
@@ -73,7 +78,7 @@ Content-Type: application/json
     "nombre": "",
     "apellidos": "",
     "email": "",
-    "password_hash": ""
+    "password": ""
 }
 
 ### Insertar con activo distinto de 0 o 1 (422)
@@ -85,7 +90,7 @@ Content-Type: application/json
     "nombre": "Ana",
     "apellidos": "Pérez",
     "email": "ana@correo.com",
-    "password_hash": "$2y$10$q0ODEJXIzDy3J9Ck9LcOyuMJVf.Kxx4t0M/K9JDUCOC35aKw8kqga",
+    "password": "Clave123*",
     "activo": 5
 }
 
@@ -98,7 +103,7 @@ Content-Type: application/json
     "nombre": "Ana",
     "apellidos": "Pérez",
     "email": "ana@correo.com",
-    "password_hash": "$2y$10$q0ODEJXIzDy3J9Ck9LcOyuMJVf.Kxx4t0M/K9JDUCOC35aKw8kqga"
+    "password": "Clave123*"
 }
 
 ### Insertar con email repetido (409)
@@ -110,7 +115,7 @@ Content-Type: application/json
     "nombre": "Otra",
     "apellidos": "Laura",
     "email": "laura@correo.com",
-    "password_hash": "$2y$10$q0ODEJXIzDy3J9Ck9LcOyuMJVf.Kxx4t0M/K9JDUCOC35aKw8kqga"
+    "password": "Clave123*"
 }
 
 ### Insertar con email repetido en mayúsculas (409)
@@ -122,10 +127,10 @@ Content-Type: application/json
     "nombre": "Otra",
     "apellidos": "Laura",
     "email": "LAURA@correo.com",
-    "password_hash": "$2y$10$q0ODEJXIzDy3J9Ck9LcOyuMJVf.Kxx4t0M/K9JDUCOC35aKw8kqga"
+    "password": "Clave123*"
 }
 
-### Listar todos los usuarios (no debe mostrar password_hash)
+### Listar todos los usuarios 
 GET {{uri}}
 
 ### Obtener usuario por id

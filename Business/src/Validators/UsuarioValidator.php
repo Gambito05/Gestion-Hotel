@@ -36,6 +36,13 @@ final class UsuarioValidator {
                 ->regex('/^[^\s@]+@[^\s@]+\.[^\s@]+$/'),
                 'mensaje' => 'El email es obligatorio, debe tener un formato válido y máximo 150 caracteres.',
             ],
+            'username' => [
+                'regla' => v::stringType()
+                ->notBlank()
+                ->length(v::between(8,16))
+                ->regex('/^[a-z0-9]{8,16}$/'),
+                'mensaje' => 'El username debe tener entre 8 y 16 caracteres, usando solo minúsculas y números.',
+            ],
             'password' => [
                 'regla' => v::stringType()
                 ->notBlank()
@@ -65,7 +72,8 @@ final class UsuarioValidator {
             $valor = $data[$campo] ?? null;
             $regla = $config['regla'];
             $mensaje = $config['mensaje'];
-            if(($campo === 'telefono' || $campo === 'activo') && ($valor === null || $valor === '')){
+            if(($campo === 'telefono' || $campo === 'activo' || $campo === 'username')
+                && ($valor === null || $valor === '')){
                 continue;
             }
             if($regla->validate($valor)->hasFailed()){

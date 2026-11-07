@@ -70,7 +70,7 @@ CREATE TABLE usuarios (
   apellidos      VARCHAR(120)  NOT NULL,
   email          VARCHAR(150)  NOT NULL,
   username       VARCHAR(50)   NULL,
-  password_hash  VARCHAR(255)  NOT NULL,
+  password       VARCHAR(255)  NOT NULL,
   telefono       VARCHAR(20)   NULL,
   activo         BOOLEAN       NOT NULL DEFAULT 1,
   CONSTRAINT uq_usuarios_email UNIQUE (email),

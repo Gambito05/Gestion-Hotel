@@ -48,7 +48,7 @@ class Usuario {
         $apellidos = trim((string) ($data['apellidos'] ?? ''));
         $email = trim((string) ($data['email'] ?? ''));
         $username = isset($data['username']) ? trim((string) $data['username']) : null;
-        $passwordHash = trim((string) ($data['password_hash'] ?? ''));
+        $password = (string) ($data['password'] ?? '');
         $telefono = isset($data['telefono']) ? trim((string) $data['telefono']) : null;
         $activo = filter_var($data['activo'] ?? 1, FILTER_VALIDATE_INT);
  
@@ -70,8 +70,8 @@ class Usuario {
         if ($username !== null && $username === '') {
             $username = null;
         }
-        if ($passwordHash === '' || mb_strlen($passwordHash) > 255) {
-            $errors['password_hash'] = 'Es obligatorio y debe tener máximo 255 caracteres.';
+        if (mb_strlen($password) < 8 || mb_strlen($password) > 64) {
+            $errors['password'] = 'Es obligatoria y debe tener entre 8 y 64 caracteres.';
         }
         if ($telefono !== null && mb_strlen($telefono) > 20) {
             $errors['telefono'] = 'Debe tener máximo 20 caracteres.';
@@ -95,7 +95,7 @@ class Usuario {
                 'apellidos' => $apellidos,
                 'email' => $email,
                 'username' => $username,
-                'password_hash' => $passwordHash,
+                'password' => password_hash($password, PASSWORD_DEFAULT),
                 'telefono' => $telefono,
                 'activo' => $activo,
             ]);
@@ -260,12 +260,12 @@ class Usuario {
                 $usuario->username = $username;
             }
 
-            if (isset($data['password_hash'])) {
-                $passwordHash = trim((string) $data['password_hash']);
-                if ($passwordHash === '' || mb_strlen($passwordHash) > 255) {
+            if (isset($data['password'])) {
+                $password = (string) $data['password'];
+                if (mb_strlen($password) < 8 || mb_strlen($password) > 64) {
                     return $this->json($response, ['error' => 'Contraseña inválida.'], 422);
                 }
-                $usuario->password_hash = $passwordHash;
+                $usuario->password = password_hash($password, PASSWORD_DEFAULT);
             }
 
             if (isset($data['telefono'])) {
