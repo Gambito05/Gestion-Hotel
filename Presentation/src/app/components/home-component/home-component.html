@@ -1,1 +1,27 @@
-<p>home-component works!</p>
+<div class="p-8">
+  <div class="rounded-xl bg-[#1F7B00] text-white p-8 shadow-md border-b-8 border-[#FCDC4D]">
+    <h1 class="text-[2rem] font-extrabold flex items-center gap-3">
+      <mat-icon class="text-[#FCDC4D]! scale-150">hotel</mat-icon>
+      Bienvenido a Gestión Hotel
+    </h1>
+    <p class="mt-2 text-white/90">Administre habitaciones, tours, reservas y usuarios desde un solo lugar.</p>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
+    <a routerLink="/habitacion" class="rounded-xl bg-white p-6 shadow-sm border-t-8 border-[#1F7B00] hover:shadow-md text-[#352D39]">
+      <mat-icon class="text-[#1F7B00]!">bed</mat-icon>
+      <h2 class="font-bold text-[1.2rem] mt-2">Habitaciones</h2>
+      <p class="text-[#352D39]/80">Tipos, servicios y disponibilidad.</p>
+    </a>
+    <a routerLink="/tour" class="rounded-xl bg-white p-6 shadow-sm border-t-8 border-[#1E9C99] hover:shadow-md text-[#352D39]">
+      <mat-icon class="text-[#1E9C99]!">tour</mat-icon>
+      <h2 class="font-bold text-[1.2rem] mt-2">Tours</h2>
+      <p class="text-[#352D39]/80">Tours, guías e idiomas.</p>
+    </a>
+    <a routerLink="/reserva" class="rounded-xl bg-white p-6 shadow-sm border-t-8 border-[#A72608] hover:shadow-md text-[#352D39]">
+      <mat-icon class="text-[#A72608]!">calendar_month</mat-icon>
+      <h2 class="font-bold text-[1.2rem] mt-2">Reservas</h2>
+      <p class="text-[#352D39]/80">Reservas de habitación y de tours.</p>
+    </a>
+  </div>
+</div>

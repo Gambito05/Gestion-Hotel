@@ -1,0 +1,101 @@
+/* Paleta del hotel: verde #1F7B00 (principal), texto #352D39,
+   turquesa #1E9C99, amarillo #FCDC4D y rojo #A72608 */
+
+.container{
+    position: absolute;
+    top: 64px;
+    bottom: 60px;
+    left: 0;
+    right: 0;
+    background-color: #ffffff;
+}
+
+.sidenav{
+    width: 220px;
+    padding-top: 12px;
+    background-color: #ffffff;
+    border-right: 4px solid #1F7B00;
+}
+
+.usuario{
+    background-color: #FCDC4D;
+    color: #352D39;
+    font-weight: 600;
+    border-radius: 0 24px 24px 0;
+    margin-right: 12px;
+}
+
+.opcion{
+    color: #352D39;
+    border-radius: 0 24px 24px 0;
+    margin-right: 12px;
+}
+
+.opcion mat-icon{
+    color: #1F7B00;
+}
+
+.opcion:hover{
+    background-color: rgba(31, 123, 0, 0.08);
+}
+
+.activo{
+    background-color: rgba(31, 123, 0, 0.15);
+    font-weight: 600;
+}
+
+.contenido{
+    background-color: #ffffff;
+    color: #352D39;
+}
+
+section{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    background-color: #ffffff;
+}
+
+.header{
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    background-color: #1F7B00;
+    color: #ffffff;
+    justify-content: space-between;
+    box-shadow: 0 2px 6px rgba(53, 45, 57, 0.25);
+}
+
+.footer{
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 60px;
+    background-color: #1F7B00;
+    color: #ffffff;
+    border-top: 4px solid #FCDC4D;
+}
+
+.botonMenu{
+    cursor: pointer;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    color: #ffffff;
+}
+
+.botonMenu:hover{
+    background-color: rgba(255, 255, 255, 0.15);
+}
+
+.botonMenu:active{
+    background-color: rgba(255, 255, 255, 0.25);
+    border: 2px solid rgba(252, 220, 77, 0.6);
+}

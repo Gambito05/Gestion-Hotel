@@ -1,1 +1,74 @@
-<p>frm-usuario works!</p>
+<h2 mat-dialog-title class="py-5! text-center font-bold! text-[#1F7B00]!"> {{titulo}} </h2>
+<mat-divider class= "border-2 border-[#1F7B00]!"></mat-divider>
+<mat-dialog-content>
+    <form id="frmUsuario" [formRoot]="frmUsuario" (submit)="guardar($event)" class="grid gap-4 py-2">
+        <mat-form-field appearance="outline">
+            <mat-label>Rol</mat-label>
+            <input matInput type="number" placeholder="1 Admin, 2 Recepcionista, 3 Cliente" [formField]="frmUsuario.rol_id">
+            @if (frmUsuario.rol_id().touched() && frmUsuario.rol_id().invalid()) {
+                @for (error of frmUsuario.rol_id().errors(); track error.kind) {
+                    <mat-error>{{error.message}}</mat-error>
+                }
+            }
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+            <mat-label>Nombre</mat-label>
+            <input matInput type="text" placeholder="Nombre" [formField]="frmUsuario.nombre">
+            @if (frmUsuario.nombre().touched() && frmUsuario.nombre().invalid()) {
+                @for (error of frmUsuario.nombre().errors(); track error.kind) {
+                    <mat-error>{{error.message}}</mat-error>
+                }
+            }
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+            <mat-label>Apellidos</mat-label>
+            <input matInput type="text" placeholder="Apellidos" [formField]="frmUsuario.apellidos">
+            @if (frmUsuario.apellidos().touched() && frmUsuario.apellidos().invalid()) {
+                @for (error of frmUsuario.apellidos().errors(); track error.kind) {
+                    <mat-error>{{error.message}}</mat-error>
+                }
+            }
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+            <mat-label>Correo</mat-label>
+            <input matInput type="email" placeholder="correo@hotel.com" [formField]="frmUsuario.email">
+            @if (frmUsuario.email().touched() && frmUsuario.email().invalid()) {
+                @for (error of frmUsuario.email().errors(); track error.kind) {
+                    <mat-error>{{error.message}}</mat-error>
+                }
+            }
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+            <mat-label>Teléfono</mat-label>
+            <input matInput type="text" placeholder="####-####" [formField]="frmUsuario.telefono!">
+            @if (frmUsuario.telefono!().touched() && frmUsuario.telefono!().invalid()) {
+                @for (error of frmUsuario.telefono!().errors(); track error.kind) {
+                    <mat-error>{{error.message}}</mat-error>
+                }
+            }
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+            <mat-label>Usuario</mat-label>
+            <input matInput type="text" placeholder="Nombre de usuario" [formField]="frmUsuario.username!">
+            @if (frmUsuario.username!().touched() && frmUsuario.username!().invalid()) {
+                @for (error of frmUsuario.username!().errors(); track error.kind) {
+                    <mat-error>{{error.message}}</mat-error>
+                }
+            }
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+            <mat-label>Contraseña</mat-label>
+            <input matInput type="password" placeholder="Contraseña" [formField]="frmUsuario.password!">
+            @if (frmUsuario.password!().touched() && frmUsuario.password!().invalid()) {
+                @for (error of frmUsuario.password!().errors(); track error.kind) {
+                    <mat-error>{{error.message}}</mat-error>
+                }
+            }
+        </mat-form-field>
+    </form>
+</mat-dialog-content>
+<mat-divider class= "border-2 border-[#1F7B00]!"></mat-divider>
+<mat-dialog-actions>
+    <button mat-button type="button" class="text-[#A72608]!" (click)="dialogRef.close()">Cancelar</button>
+    <button mat-flat-button type="submit" form="frmUsuario" class="bg-[#1F7B00]! text-white!">Guardar</button>
+</mat-dialog-actions>

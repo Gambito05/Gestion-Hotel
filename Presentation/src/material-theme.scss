@@ -1,0 +1,72 @@
+// Include theming for Angular Material with `mat.theme()`.
+// This Sass mixin will define CSS variables that are used for styling Angular Material
+// components according to the Material 3 design spec.
+// Learn more about theming and how to use it for your application's
+// custom components at https://material.angular.dev/guide/theming
+@use '@angular/material' as mat;
+
+// Paleta del hotel (hotel_colores.pdf)
+// Verde principal: #1F7B00 | Texto: #352D39 | Turquesa: #1E9C99
+// Amarillo: #FCDC4D | Rojo: #A72608 | Fondo: blanco
+
+html {
+  height: 100%;
+  @include mat.theme(
+    (
+      color: (
+        primary: mat.$green-palette,
+        tertiary: mat.$cyan-palette,
+      ),
+      typography: Roboto,
+      density: 0,
+    )
+  );
+
+  // Se reemplazan los colores del sistema de Material por los de la paleta del hotel
+  @include mat.theme-overrides(
+    (
+      primary: #1f7b00,
+      on-primary: #ffffff,
+      primary-container: #d8f5c9,
+      on-primary-container: #0b3000,
+      secondary: #1e9c99,
+      on-secondary: #ffffff,
+      secondary-container: #d2f1f0,
+      on-secondary-container: #003735,
+      tertiary: #1e9c99,
+      on-tertiary: #ffffff,
+      error: #a72608,
+      on-error: #ffffff,
+      error-container: #fbe0d9,
+      on-error-container: #410900,
+      background: #ffffff,
+      on-background: #352d39,
+      surface: #ffffff,
+      on-surface: #352d39,
+      on-surface-variant: #5c5460,
+      surface-container-lowest: #ffffff,
+      surface-container-low: #ffffff,
+      surface-container: #ffffff,
+      surface-container-high: #f6faf3,
+      surface-container-highest: #eef5ea,
+      outline: #7a7180,
+      outline-variant: #d9d4dc,
+    )
+  );
+}
+
+body {
+  // Default the application to a light color theme. This can be changed to
+  // `dark` to enable the dark color theme, or to `light dark` to defer to the
+  // user's system settings.
+  color-scheme: light;
+
+  // Fondo blanco y letra #352D39 en toda la aplicación
+  background-color: #ffffff;
+  color: #352d39;
+  font: var(--mat-sys-body-medium);
+
+  // Reset the user agent margin.
+  margin: 0;
+  height: 100%;
+}
