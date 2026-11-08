@@ -1,6 +1,6 @@
 @host = http://localhost:9090/api
 @uri = {{host}}/habitaciones
-@token = PEGAR_AQUI_EL_TOKEN_DEL_LOGIN
+@token = eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJnZXN0aW9uLWhvdGVsLWJ1c2luZXNzIiwiaWF0IjoxNzk0MTEzODk0LCJleHAiOjE3OTQxMTc0OTQsInN1YiI6IjEiLCJ1c2VybmFtZSI6ImFkbWluYnJ5YW4iLCJlbWFpbCI6ImJyeWFuQGhvdGVsLmNvbSIsInJvbF9pZCI6MX0.VFkQXVQ8hgjoiRCvZCMtIjf15B8G1C77BTsziqmomeM
 
 ### Listar todos
 GET {{uri}}
@@ -44,8 +44,8 @@ Authorization: Bearer {{token}}
 
 {
     "tipo_habitacion_id": 1,
-    "numero": "103",
-    "piso": 1
+    "numero": "150",
+    "piso": 6
 }
 
 ### Insertar con número en minúsculas (400)

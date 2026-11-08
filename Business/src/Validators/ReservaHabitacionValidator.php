@@ -76,14 +76,14 @@ final class ReservaHabitacionValidator {
             'checkin_at' => [
                 'regla' => v::stringType()
                 ->notBlank()
-                ->length(v::between(19,19))
+                ->length(v::equals(19))
                 ->regex('/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/'),
                 'mensaje' => 'La fecha de check-in debe tener el formato AAAA-MM-DD HH:MM:SS.',
             ],
             'checkout_at' => [
                 'regla' => v::stringType()
                 ->notBlank()
-                ->length(v::between(19,19))
+                ->length(v::equals(19))
                 ->regex('/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/'),
                 'mensaje' => 'La fecha de check-out debe tener el formato AAAA-MM-DD HH:MM:SS.',
             ],

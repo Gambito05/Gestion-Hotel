@@ -26,7 +26,7 @@ final class TourProgramadoValidator {
             'fecha_hora_inicio' => [
                 'regla' => v::stringType()
                 ->notBlank()
-                ->length(v::between(19,19))
+                ->length(v::equals(19))
                 ->regex('/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/'),
                 'mensaje' => 'La fecha y hora de inicio es obligatoria y debe tener el formato AAAA-MM-DD HH:MM:SS.',
             ],

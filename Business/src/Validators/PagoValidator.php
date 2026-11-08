@@ -37,7 +37,7 @@ final class PagoValidator {
             'moneda' => [
                 'regla' => v::stringType()
                 ->notBlank()
-                ->length(v::between(3,3))
+                ->length(v::equals(3))
                 ->regex('/^(CRC|USD)$/'),
                 'mensaje' => 'La moneda debe ser CRC o USD.',
             ],
@@ -58,7 +58,7 @@ final class PagoValidator {
             'pagado_at' => [
                 'regla' => v::stringType()
                 ->notBlank()
-                ->length(v::between(19,19))
+                ->length(v::equals(19))
                 ->regex('/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/'),
                 'mensaje' => 'La fecha de pago es obligatoria y debe tener el formato AAAA-MM-DD HH:MM:SS.',
             ],
