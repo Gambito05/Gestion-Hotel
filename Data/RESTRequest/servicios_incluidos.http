@@ -113,3 +113,13 @@ GET {{uri}}/filter/10/10
 ### Filtrar con límite fuera de rango (422)
 GET {{uri}}/filter/0/500
 
+### Quitar la relación (tipo_habitacion_id=1, servicio_habitacion_id=1)
+DELETE {{uri}}/1/1
+
+### Quitar una relación que no existe (404)
+DELETE {{uri}}/1/9999
+
+### Ids inválidos (422)
+DELETE {{uri}}/abc/1
+
+###

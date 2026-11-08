@@ -125,6 +125,28 @@ class IdiomaGuia {
  
  
  
+    public function delete(Request $request, Response $response, array $args): Response {
+        $guiaId = filter_var($args['guia_id'] ?? '', FILTER_VALIDATE_INT);
+        $idiomaId = filter_var($args['idioma_id'] ?? '', FILTER_VALIDATE_INT);
+
+        if ($guiaId === false || $guiaId < 1 || $idiomaId === false || $idiomaId < 1) {
+            return $this->json($response, ['error' => 'Los ids deben ser números enteros válidos.'], 422);
+        }
+
+        $this->container->get('eloquent');
+        #La llave primaria es compuesta, por eso se borra con una consulta y no con find()
+        $eliminados = IdiomaGuiaModel::query()
+            ->where('guia_id', $guiaId)
+            ->where('idioma_id', $idiomaId)
+            ->delete();
+
+        if ($eliminados === 0) {
+            return $this->json($response, ['error' => 'El guía no tiene asignado ese idioma.'], 404);
+        }
+
+        return $this->json($response, ['message' => 'Idioma quitado del guía correctamente.'], 200);
+    }
+
     private function json(Response $response, array $payload, int $status): Response{
     $response->getBody()->write(json_encode($payload,
         JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR));

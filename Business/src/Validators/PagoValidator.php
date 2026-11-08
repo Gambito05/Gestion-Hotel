@@ -5,6 +5,7 @@ namespace App\Validators;
 
 use Respect\Validation\ValidatorBuilder as v;
 use Respect\Validation\Exceptions\ValidationException;
+use App\Services\DataService;
 
 final class PagoValidator {
     private function reglas(): array {
@@ -64,10 +65,14 @@ final class PagoValidator {
         ];
     }
 
-    public function validate(array $data): array {
+    public function validate(array $data, bool $parcial = false): array {
         $errores = [];
 
         foreach ($this->reglas() as $campo => $config){
+            #En una actualización solo se validan los campos que se envían
+            if($parcial && !array_key_exists($campo, $data)){
+                continue;
+            }
             $valor = $data[$campo] ?? null;
             $regla = $config['regla'];
             $mensaje = $config['mensaje'];
@@ -79,5 +84,33 @@ final class PagoValidator {
             }
         }
         return $errores;
+    }
+
+    #----- Reglas de negocio: se revisan contra la capa de datos después de validar el formato -----
+    #$pago: datos completos del pago (en una actualización, lo que había más los cambios)
+    public function aplicarReglas(DataService $dataservice, array $pago): array {
+        $reservaHabitacion = $pago['reserva_habitacion_id'] ?? null;
+        $reservaTour = $pago['reserva_tour_id'] ?? null;
+        $tieneHabitacion = $reservaHabitacion !== null && $reservaHabitacion !== '';
+        $tieneTour = $reservaTour !== null && $reservaTour !== '';
+
+        #1. El pago es de una sola reserva: de habitación o de tour
+        if ($tieneHabitacion === $tieneTour) {
+            throw new ReglaNegocioException('El pago debe asociarse a una reserva de habitación o a una reserva de tour, pero no a ambas.', 400);
+        }
+
+        #2. La reserva existe y no está cancelada
+        $path = $tieneHabitacion
+            ? 'reservas-habitacion/' . rawurlencode((string) $reservaHabitacion)
+            : 'reservas-tour/' . rawurlencode((string) $reservaTour);
+        $reserva = $dataservice->obtener($path);
+        if ($reserva === null) {
+            throw new ReglaNegocioException('La reserva indicada no existe.', 422);
+        }
+        if ($reserva['data']['estado'] === 'CANCELADA') {
+            throw new ReglaNegocioException('No se puede registrar un pago para una reserva cancelada.', 409);
+        }
+
+        return $pago;
     }
 }

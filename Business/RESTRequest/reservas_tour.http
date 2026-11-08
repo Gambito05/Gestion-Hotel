@@ -93,4 +93,29 @@ Authorization: Bearer {{token}}
     "total": "cuarenta mil"
 }
 
+### ===== Reglas de negocio =====
+### Reserva sin precio ni total: la capa de negocio los calcula (personas x precio del tour)
+POST {{uri}}
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "codigo": "RT-0100",
+    "tour_programado_id": 1,
+    "cliente_id": 3,
+    "personas": 2
+}
+
+### Más personas que el cupo que queda (409)
+POST {{uri}}
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "codigo": "RT-0101",
+    "tour_programado_id": 1,
+    "cliente_id": 3,
+    "personas": 200
+}
+
 ###

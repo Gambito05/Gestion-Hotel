@@ -97,9 +97,23 @@ class Rol {
 
     public function update(Request $request, Response $response, array $args): Response {
         try {
-            $dataservice = $this->container->get(DataService::class);
+            $request->getBody()->rewind();
             $body = (string) $request->getBody();
-            $upstream = $dataservice->put('roles/' . rawurlencode($args['id']), $body);
+
+            $data = json_decode($body, true);
+
+            if (!is_array($data) || json_last_error() !== JSON_ERROR_NONE) {
+                return $this->json($response, ['errors' => ['body' => 'Debe enviar un objeto JSON válido']], 400);
+            }
+
+            #Validación parcial: solo se revisan los campos que vienen en la petición
+            $errors = (new RolValidator())->validate($data, true);
+            if ($errors !== []) {
+                return $this->json($response, ['errors' => $errors], 400);
+            }
+
+            $dataservice = $this->container->get(DataService::class);
+            $upstream = $dataservice->put('roles/' . rawurlencode($args['id']), json_encode($data, JSON_THROW_ON_ERROR));
 
             return $this->json($response, json_decode((string) $upstream->getBody(), true), $upstream->getStatusCode());
 

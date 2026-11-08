@@ -3,103 +3,113 @@
 namespace App\controllers;
 
 use Slim\Routing\RouteCollectorProxy;
+use App\Services\RolMiddleware;
 
+#Permisos por rol: se agregan a cada ruta con ->add()
+$soloAdmin = new RolMiddleware([RolMiddleware::ADMIN]);
+$personal = new RolMiddleware([RolMiddleware::ADMIN, RolMiddleware::RECEPCIONISTA]);
+$todos = new RolMiddleware([RolMiddleware::ADMIN, RolMiddleware::RECEPCIONISTA, RolMiddleware::CLIENTE]);
 
-
-$app->group('/api', function(RouteCollectorProxy $api) {
+$app->group('/api', function(RouteCollectorProxy $api) use ($soloAdmin, $personal, $todos) {
     $api->group('/auth', function(RouteCollectorProxy $endpoint) {
         $endpoint->post('/login', Auth::class . ':login');
     });
-    $api->group('/roles', function(RouteCollectorProxy $endpoint) {
-        $endpoint->get('[/{id}]',Rol::class . ':read');
-        $endpoint->get('/filter/{offset}/{limit}',Rol::class . ':filter');
-        $endpoint->post('',Rol::class .':create');
-        $endpoint->put('/{id}',Rol::class. ':update');
-        $endpoint->delete('/{id}',Rol::class . ':delete');
+    $api->group('/roles', function(RouteCollectorProxy $endpoint) use ($soloAdmin, $personal) {
+        $endpoint->get('[/{id}]',Rol::class . ':read')->add($personal);
+        $endpoint->get('/filter/{offset}/{limit}',Rol::class . ':filter')->add($personal);
+        $endpoint->post('',Rol::class .':create')->add($soloAdmin);
+        $endpoint->put('/{id}',Rol::class. ':update')->add($soloAdmin);
+        $endpoint->delete('/{id}',Rol::class . ':delete')->add($soloAdmin);
     });
-    $api->group('/usuarios', function(RouteCollectorProxy $endpoint) {
-        $endpoint->get('[/{id}]',Usuario::class . ':read');
-        $endpoint->get('/filter/{offset}/{limit}',Usuario::class . ':filter');
-        $endpoint->post('',Usuario::class .':create');
-        $endpoint->put('/{id}',Usuario::class. ':update');
-        $endpoint->delete('/{id}',Usuario::class . ':delete');
+    #La recepcionista solo puede crear o modificar clientes (se revisa en el controlador)
+    $api->group('/usuarios', function(RouteCollectorProxy $endpoint) use ($soloAdmin, $personal) {
+        $endpoint->get('[/{id}]',Usuario::class . ':read')->add($personal);
+        $endpoint->get('/filter/{offset}/{limit}',Usuario::class . ':filter')->add($personal);
+        $endpoint->post('',Usuario::class .':create')->add($personal);
+        $endpoint->put('/{id}',Usuario::class. ':update')->add($personal);
+        $endpoint->delete('/{id}',Usuario::class . ':delete')->add($soloAdmin);
     });
-    $api->group('/tipos-habitacion', function(RouteCollectorProxy $endpoint) {
-        $endpoint->get('[/{id}]',TipoHabitacion::class . ':read');
-        $endpoint->get('/filter/{offset}/{limit}',TipoHabitacion::class . ':filter');
-        $endpoint->post('',TipoHabitacion::class .':create');
-        $endpoint->put('/{id}',TipoHabitacion::class. ':update');
-        $endpoint->delete('/{id}',TipoHabitacion::class . ':delete');
+    $api->group('/tipos-habitacion', function(RouteCollectorProxy $endpoint) use ($soloAdmin, $todos) {
+        $endpoint->get('[/{id}]',TipoHabitacion::class . ':read')->add($todos);
+        $endpoint->get('/filter/{offset}/{limit}',TipoHabitacion::class . ':filter')->add($todos);
+        $endpoint->post('',TipoHabitacion::class .':create')->add($soloAdmin);
+        $endpoint->put('/{id}',TipoHabitacion::class. ':update')->add($soloAdmin);
+        $endpoint->delete('/{id}',TipoHabitacion::class . ':delete')->add($soloAdmin);
     });
-    $api->group('/servicios-habitacion', function(RouteCollectorProxy $endpoint) {
-        $endpoint->get('[/{id}]',ServicioHabitacion::class . ':read');
-        $endpoint->get('/filter/{offset}/{limit}',ServicioHabitacion::class . ':filter');
-        $endpoint->post('',ServicioHabitacion::class .':create');
-        $endpoint->put('/{id}',ServicioHabitacion::class. ':update');
-        $endpoint->delete('/{id}',ServicioHabitacion::class . ':delete');
+    $api->group('/servicios-habitacion', function(RouteCollectorProxy $endpoint) use ($soloAdmin, $todos) {
+        $endpoint->get('[/{id}]',ServicioHabitacion::class . ':read')->add($todos);
+        $endpoint->get('/filter/{offset}/{limit}',ServicioHabitacion::class . ':filter')->add($todos);
+        $endpoint->post('',ServicioHabitacion::class .':create')->add($soloAdmin);
+        $endpoint->put('/{id}',ServicioHabitacion::class. ':update')->add($soloAdmin);
+        $endpoint->delete('/{id}',ServicioHabitacion::class . ':delete')->add($soloAdmin);
     });
-    $api->group('/habitaciones', function(RouteCollectorProxy $endpoint) {
-        $endpoint->get('[/{id}]',Habitacion::class . ':read');
-        $endpoint->get('/filter/{offset}/{limit}',Habitacion::class . ':filter');
-        $endpoint->post('',Habitacion::class .':create');
-        $endpoint->put('/{id}',Habitacion::class. ':update');
-        $endpoint->delete('/{id}',Habitacion::class . ':delete');
+    $api->group('/habitaciones', function(RouteCollectorProxy $endpoint) use ($soloAdmin, $todos) {
+        $endpoint->get('[/{id}]',Habitacion::class . ':read')->add($todos);
+        $endpoint->get('/filter/{offset}/{limit}',Habitacion::class . ':filter')->add($todos);
+        $endpoint->post('',Habitacion::class .':create')->add($soloAdmin);
+        $endpoint->put('/{id}',Habitacion::class. ':update')->add($soloAdmin);
+        $endpoint->delete('/{id}',Habitacion::class . ':delete')->add($soloAdmin);
     });
-    $api->group('/guias', function(RouteCollectorProxy $endpoint) {
-        $endpoint->get('[/{id}]',Guia::class . ':read');
-        $endpoint->get('/filter/{offset}/{limit}',Guia::class . ':filter');
-        $endpoint->post('',Guia::class .':create');
-        $endpoint->put('/{id}',Guia::class. ':update');
-        $endpoint->delete('/{id}',Guia::class . ':delete');
+    $api->group('/guias', function(RouteCollectorProxy $endpoint) use ($soloAdmin, $todos) {
+        $endpoint->get('[/{id}]',Guia::class . ':read')->add($todos);
+        $endpoint->get('/filter/{offset}/{limit}',Guia::class . ':filter')->add($todos);
+        $endpoint->post('',Guia::class .':create')->add($soloAdmin);
+        $endpoint->put('/{id}',Guia::class. ':update')->add($soloAdmin);
+        $endpoint->delete('/{id}',Guia::class . ':delete')->add($soloAdmin);
     });
-    $api->group('/idiomas', function(RouteCollectorProxy $endpoint) {
-        $endpoint->get('[/{id}]',Idioma::class . ':read');
-        $endpoint->get('/filter/{offset}/{limit}',Idioma::class . ':filter');
-        $endpoint->post('',Idioma::class .':create');
-        $endpoint->put('/{id}',Idioma::class. ':update');
-        $endpoint->delete('/{id}',Idioma::class . ':delete');
+    $api->group('/idiomas', function(RouteCollectorProxy $endpoint) use ($soloAdmin, $todos) {
+        $endpoint->get('[/{id}]',Idioma::class . ':read')->add($todos);
+        $endpoint->get('/filter/{offset}/{limit}',Idioma::class . ':filter')->add($todos);
+        $endpoint->post('',Idioma::class .':create')->add($soloAdmin);
+        $endpoint->put('/{id}',Idioma::class. ':update')->add($soloAdmin);
+        $endpoint->delete('/{id}',Idioma::class . ':delete')->add($soloAdmin);
     });
-    $api->group('/tours', function(RouteCollectorProxy $endpoint) {
-        $endpoint->get('[/{id}]',Tour::class . ':read');
-        $endpoint->get('/filter/{offset}/{limit}',Tour::class . ':filter');
-        $endpoint->post('',Tour::class .':create');
-        $endpoint->put('/{id}',Tour::class. ':update');
-        $endpoint->delete('/{id}',Tour::class . ':delete');
+    $api->group('/tours', function(RouteCollectorProxy $endpoint) use ($soloAdmin, $todos) {
+        $endpoint->get('[/{id}]',Tour::class . ':read')->add($todos);
+        $endpoint->get('/filter/{offset}/{limit}',Tour::class . ':filter')->add($todos);
+        $endpoint->post('',Tour::class .':create')->add($soloAdmin);
+        $endpoint->put('/{id}',Tour::class. ':update')->add($soloAdmin);
+        $endpoint->delete('/{id}',Tour::class . ':delete')->add($soloAdmin);
     });
-    $api->group('/tours-programados', function(RouteCollectorProxy $endpoint) {
-        $endpoint->get('[/{id}]',TourProgramado::class . ':read');
-        $endpoint->get('/filter/{offset}/{limit}',TourProgramado::class . ':filter');
-        $endpoint->post('',TourProgramado::class .':create');
-        $endpoint->put('/{id}',TourProgramado::class. ':update');
-        $endpoint->delete('/{id}',TourProgramado::class . ':delete');
+    $api->group('/tours-programados', function(RouteCollectorProxy $endpoint) use ($personal, $todos) {
+        $endpoint->get('[/{id}]',TourProgramado::class . ':read')->add($todos);
+        $endpoint->get('/filter/{offset}/{limit}',TourProgramado::class . ':filter')->add($todos);
+        $endpoint->post('',TourProgramado::class .':create')->add($personal);
+        $endpoint->put('/{id}',TourProgramado::class. ':update')->add($personal);
+        $endpoint->delete('/{id}',TourProgramado::class . ':delete')->add($personal);
     });
-    $api->group('/reservas-habitacion', function(RouteCollectorProxy $endpoint) {
-        $endpoint->get('[/{id}]',ReservaHabitacion::class . ':read');
-        $endpoint->get('/filter/{offset}/{limit}',ReservaHabitacion::class . ':filter');
-        $endpoint->post('',ReservaHabitacion::class .':create');
-        $endpoint->put('/{id}',ReservaHabitacion::class. ':update');
-        $endpoint->delete('/{id}',ReservaHabitacion::class . ':delete');
+    #El cliente solo ve y crea sus propias reservas (se revisa en el controlador)
+    $api->group('/reservas-habitacion', function(RouteCollectorProxy $endpoint) use ($soloAdmin, $personal, $todos) {
+        $endpoint->get('[/{id}]',ReservaHabitacion::class . ':read')->add($todos);
+        $endpoint->get('/filter/{offset}/{limit}',ReservaHabitacion::class . ':filter')->add($todos);
+        $endpoint->post('',ReservaHabitacion::class .':create')->add($todos);
+        $endpoint->put('/{id}',ReservaHabitacion::class. ':update')->add($personal);
+        $endpoint->delete('/{id}',ReservaHabitacion::class . ':delete')->add($soloAdmin);
     });
-    $api->group('/reservas-tour', function(RouteCollectorProxy $endpoint) {
-        $endpoint->get('[/{id}]',ReservaTour::class . ':read');
-        $endpoint->get('/filter/{offset}/{limit}',ReservaTour::class . ':filter');
-        $endpoint->post('',ReservaTour::class .':create');
-        $endpoint->put('/{id}',ReservaTour::class. ':update');
-        $endpoint->delete('/{id}',ReservaTour::class . ':delete');
+    $api->group('/reservas-tour', function(RouteCollectorProxy $endpoint) use ($soloAdmin, $personal, $todos) {
+        $endpoint->get('[/{id}]',ReservaTour::class . ':read')->add($todos);
+        $endpoint->get('/filter/{offset}/{limit}',ReservaTour::class . ':filter')->add($todos);
+        $endpoint->post('',ReservaTour::class .':create')->add($todos);
+        $endpoint->put('/{id}',ReservaTour::class. ':update')->add($personal);
+        $endpoint->delete('/{id}',ReservaTour::class . ':delete')->add($soloAdmin);
     });
-    $api->group('/pagos', function(RouteCollectorProxy $endpoint) {
-        $endpoint->get('[/{id}]',Pago::class . ':read');
-        $endpoint->get('/filter/{offset}/{limit}',Pago::class . ':filter');
-        $endpoint->post('',Pago::class .':create');
-        $endpoint->put('/{id}',Pago::class. ':update');
-        $endpoint->delete('/{id}',Pago::class . ':delete');
+    $api->group('/pagos', function(RouteCollectorProxy $endpoint) use ($soloAdmin, $personal) {
+        $endpoint->get('[/{id}]',Pago::class . ':read')->add($personal);
+        $endpoint->get('/filter/{offset}/{limit}',Pago::class . ':filter')->add($personal);
+        $endpoint->post('',Pago::class .':create')->add($personal);
+        $endpoint->put('/{id}',Pago::class. ':update')->add($personal);
+        $endpoint->delete('/{id}',Pago::class . ':delete')->add($soloAdmin);
     });
-    $api->group('/servicios-incluidos', function(RouteCollectorProxy $endpoint) {
-        $endpoint->get('',ServicioIncluido::class . ':read');
-        $endpoint->post('',ServicioIncluido::class .':create');
+    $api->group('/servicios-incluidos', function(RouteCollectorProxy $endpoint) use ($soloAdmin, $todos) {
+        $endpoint->get('',ServicioIncluido::class . ':read')->add($todos);
+        $endpoint->get('/filter/{offset}/{limit}',ServicioIncluido::class . ':filter')->add($todos);
+        $endpoint->post('',ServicioIncluido::class .':create')->add($soloAdmin);
+        $endpoint->delete('/{tipo_habitacion_id}/{servicio_habitacion_id}',ServicioIncluido::class . ':delete')->add($soloAdmin);
     });
-    $api->group('/idiomas-guia', function(RouteCollectorProxy $endpoint) {
-        $endpoint->get('',IdiomaGuia::class . ':read');
-        $endpoint->post('',IdiomaGuia::class .':create');
+    $api->group('/idiomas-guia', function(RouteCollectorProxy $endpoint) use ($soloAdmin, $todos) {
+        $endpoint->get('',IdiomaGuia::class . ':read')->add($todos);
+        $endpoint->get('/filter/{offset}/{limit}',IdiomaGuia::class . ':filter')->add($todos);
+        $endpoint->post('',IdiomaGuia::class .':create')->add($soloAdmin);
+        $endpoint->delete('/{guia_id}/{idioma_id}',IdiomaGuia::class . ':delete')->add($soloAdmin);
     });
 });

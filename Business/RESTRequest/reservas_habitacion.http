@@ -160,4 +160,82 @@ Authorization: Bearer {{token}}
     "checkout_at": "2026-12-23 11:00:00"
 }
 
+### ===== Reglas de negocio =====
+### Reserva sin precio ni total: la capa de negocio los calcula (noches x precio del tipo)
+POST {{uri}}
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "codigo": "RH-0100",
+    "cliente_id": 3,
+    "habitacion_id": 1,
+    "fecha_entrada": "2026-12-20",
+    "fecha_salida": "2026-12-23",
+    "huespedes": 2
+}
+
+### Misma habitación con fechas que se cruzan con la anterior (409)
+POST {{uri}}
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "codigo": "RH-0101",
+    "cliente_id": 3,
+    "habitacion_id": 1,
+    "fecha_entrada": "2026-12-22",
+    "fecha_salida": "2026-12-24",
+    "huespedes": 1
+}
+
+### Más huéspedes que la capacidad del tipo de habitación (400)
+POST {{uri}}
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "codigo": "RH-0102",
+    "cliente_id": 3,
+    "habitacion_id": 1,
+    "fecha_entrada": "2027-01-10",
+    "fecha_salida": "2027-01-12",
+    "huespedes": 20
+}
+
+### Fecha de salida igual a la de entrada (400)
+POST {{uri}}
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "codigo": "RH-0103",
+    "cliente_id": 3,
+    "habitacion_id": 1,
+    "fecha_entrada": "2027-01-10",
+    "fecha_salida": "2027-01-10",
+    "huespedes": 1
+}
+
+### Actualizar con un estado que no existe (400, validación parcial)
+PUT {{uri}}/1
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "estado": "XYZ"
+}
+
+### Buscar reservas que se cruzan con un rango de fechas
+GET {{uri}}/filter/0/10?habitacion_id=1&entrada_antes_de=2026-12-31&salida_despues_de=2026-12-01
+Authorization: Bearer {{token}}
+
+### Con token de cliente: listar todas (403)
+GET {{uri}}
+Authorization: Bearer {{token}}
+
+### Con token de cliente: el filtro solo devuelve sus reservas aunque pida otro cliente_id
+GET {{uri}}/filter/0/10?cliente_id=1
+Authorization: Bearer {{token}}
+
 ###

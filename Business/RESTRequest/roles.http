@@ -84,4 +84,14 @@ Authorization: Bearer {{token}}
 DELETE {{uri}}/9999
 Authorization: Bearer {{token}}
 
+### ===== Control por rol =====
+### Con token de recepcionista o cliente: crear un rol (403)
+POST {{uri}}
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "nombre": "Gerente"
+}
+
 ###

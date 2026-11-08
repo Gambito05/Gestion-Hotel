@@ -130,4 +130,30 @@ Authorization: Bearer {{token}}
     "pagado_at": "2026-12-20 08:45:00"
 }
 
+### ===== Reglas de negocio =====
+### Pago asociado a las dos reservas a la vez (400)
+POST {{uri}}
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "reserva_habitacion_id": 1,
+    "reserva_tour_id": 1,
+    "monto": 1000,
+    "metodo": "EFECTIVO"
+}
+
+### Pago sin registrado_por: se toma el usuario del token
+POST {{uri}}
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "reserva_habitacion_id": 1,
+    "monto": 1000,
+    "moneda": "CRC",
+    "metodo": "SINPE",
+    "referencia": "SINPE-0001"
+}
+
 ###

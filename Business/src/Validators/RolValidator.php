@@ -19,10 +19,14 @@ final class RolValidator {
         ];
     }
 
-    public function validate(array $data): array {
+    public function validate(array $data, bool $parcial = false): array {
         $errores = [];
 
         foreach ($this->reglas() as $campo => $config){
+            #En una actualización solo se validan los campos que se envían
+            if($parcial && !array_key_exists($campo, $data)){
+                continue;
+            }
             $valor = $data[$campo] ?? null;
             $regla = $config['regla'];
             $mensaje = $config['mensaje'];

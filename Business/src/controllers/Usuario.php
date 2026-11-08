@@ -9,6 +9,7 @@ use App\Services\DataService;
 use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\RequestException;
 use App\Validators\UsuarioValidator;
+use App\Services\RolMiddleware;
 
 class Usuario {
 
@@ -48,9 +49,13 @@ class Usuario {
             #Se envían siempre todas las llaves para que la capa de datos no reciba parámetros indefinidos
             $query = [
                 'nombre' => trim((string) ($params['nombre'] ?? '')),
+                'apellidos' => trim((string) ($params['apellidos'] ?? '')),
                 'email' => trim((string) ($params['email'] ?? '')),
                 'username' => trim((string) ($params['username'] ?? '')),
-                'rol_id' => trim((string) ($params['rol_id'] ?? ''))
+                'telefono' => trim((string) ($params['telefono'] ?? '')),
+                'rol' => trim((string) ($params['rol'] ?? '')),
+                'rol_id' => trim((string) ($params['rol_id'] ?? '')),
+                'activo' => trim((string) ($params['activo'] ?? ''))
             ];
 
             $dataservice = $this->container->get(DataService::class);
@@ -80,6 +85,12 @@ class Usuario {
                 return $this->json($response, ['errors' => ['body' => 'Debe enviar un objeto JSON válido']], 400);
             }
 
+            #La recepcionista solo puede registrar clientes
+            if (RolMiddleware::rolDe($request) === RolMiddleware::RECEPCIONISTA
+                && (int) ($data['rol_id'] ?? 0) !== RolMiddleware::CLIENTE) {
+                return $this->json($response, ['error' => 'La recepcionista solo puede registrar usuarios con rol de cliente.'], 403);
+            }
+
             #Validación en la capa de negocio: si falla, no se consume la capa de datos
             $errors = (new UsuarioValidator())->validate($data);
             if ($errors !== []) {
@@ -100,22 +111,36 @@ class Usuario {
 
     public function update(Request $request, Response $response, array $args): Response {
         try {
-            $data = $request->getParsedBody();
-            if (is_array($data) && array_key_exists('username', $data)) {
-                $username = trim((string) $data['username']);
-                if (!preg_match('/^[a-z0-9]{8,16}$/', $username)) {
-                    return $this->json($response, [
-                        'errors' => [
-                            'username' => 'El username debe tener entre 8 y 16 caracteres, usando solo minúsculas y números.',
-                        ],
-                    ], 400);
-                }
+            $request->getBody()->rewind();
+            $body = (string) $request->getBody();
+
+            $data = json_decode($body, true);
+
+            if (!is_array($data) || json_last_error() !== JSON_ERROR_NONE) {
+                return $this->json($response, ['errors' => ['body' => 'Debe enviar un objeto JSON válido']], 400);
+            }
+
+            #Validación parcial: solo se revisan los campos que vienen en la petición
+            $errors = (new UsuarioValidator())->validate($data, true);
+            if ($errors !== []) {
+                return $this->json($response, ['errors' => $errors], 400);
             }
 
             $dataservice = $this->container->get(DataService::class);
-            $request->getBody()->rewind();
-            $body = (string) $request->getBody();
-            $upstream = $dataservice->put('usuarios/' . rawurlencode($args['id']), $body);
+
+            #La recepcionista solo puede modificar clientes y no puede cambiarles el rol
+            if (RolMiddleware::rolDe($request) === RolMiddleware::RECEPCIONISTA) {
+                $usuario = $dataservice->obtener('usuarios/' . rawurlencode($args['id']));
+                if ($usuario === null) {
+                    return $this->json($response, ['error' => 'Usuario no encontrado.'], 404);
+                }
+                if ((int) $usuario['data']['rol_id'] !== RolMiddleware::CLIENTE
+                    || (isset($data['rol_id']) && (int) $data['rol_id'] !== RolMiddleware::CLIENTE)) {
+                    return $this->json($response, ['error' => 'La recepcionista solo puede modificar usuarios con rol de cliente.'], 403);
+                }
+            }
+
+            $upstream = $dataservice->put('usuarios/' . rawurlencode($args['id']), json_encode($data, JSON_THROW_ON_ERROR));
 
             return $this->json($response, json_decode((string) $upstream->getBody(), true), $upstream->getStatusCode());
 

@@ -20,6 +20,9 @@ $container = new Container();
 $dotenv = Dotenv\Dotenv::createImmutable('/var/www/html');
 $dotenv->load();
 
+#Las reglas de negocio comparan fechas con "hoy" y "ahora"; el contenedor trabaja en UTC por defecto
+date_default_timezone_set($_ENV['APP_TIMEZONE'] ?? 'America/Costa_Rica');
+
 AppFactory::setContainer($container);
 
 $app = AppFactory::create();
@@ -47,20 +50,23 @@ $errorMiddleware->setErrorHandler(AuthorizationException::class,
 );
 $app->add(function (Request $request, RequestHandler $handler) use ($app): Response {
 	$origin = $request->getHeaderLine('Origin');
-	$allowedOrigin = $_ENV['CORS_ALLOWED_ORIGIN'] ?? 'http://localhost:4200';
+	#Orígenes permitidos separados por coma: navegador (ng serve) y la app de Android con Capacitor
+	$allowedOrigins = array_map('trim', explode(',',
+		$_ENV['CORS_ALLOWED_ORIGIN'] ?? 'http://localhost:4200,https://localhost,http://localhost,capacitor://localhost'));
+	$permitido = in_array($origin, $allowedOrigins, true);
 
-	if ($request->getMethod() === 'OPTIONS' && $origin === $allowedOrigin) {
+	if ($request->getMethod() === 'OPTIONS' && $permitido) {
 		$response = $app->getResponseFactory()->createResponse(204);
 	} else {
 		$response = $handler->handle($request);
 	}
 
-	if ($origin !== $allowedOrigin) {
+	if (!$permitido) {
 		return $response;
 	}
 
 	return $response
-		->withHeader('Access-Control-Allow-Origin', $allowedOrigin)
+		->withHeader('Access-Control-Allow-Origin', $origin)
 		->withHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS')
 		->withHeader('Access-Control-Allow-Headers', 'Accept, Authorization, Content-Type, Origin, X-Requested-With')
 		->withHeader('Vary', 'Origin');

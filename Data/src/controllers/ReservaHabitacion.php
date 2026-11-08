@@ -155,6 +155,9 @@ class ReservaHabitacion {
         $estado = trim((string) ($params['estado'] ?? ''));
         $fechaEntrada = trim((string) ($params['fecha_entrada'] ?? ''));
         $fechaSalida = trim((string) ($params['fecha_salida'] ?? ''));
+        #Rango usado por la capa de negocio para buscar reservas que se cruzan con unas fechas
+        $entradaAntesDe = trim((string) ($params['entrada_antes_de'] ?? ''));
+        $salidaDespuesDe = trim((string) ($params['salida_despues_de'] ?? ''));
 
         $query = ReservaHabitacionModel::query()
             ->select([
@@ -190,6 +193,12 @@ class ReservaHabitacion {
         }
         if ($fechaSalida !== '') {
             $query->whereDate('fecha_salida', $fechaSalida);
+        }
+        if ($entradaAntesDe !== '') {
+            $query->where('fecha_entrada', '<', $entradaAntesDe);
+        }
+        if ($salidaDespuesDe !== '') {
+            $query->where('fecha_salida', '>', $salidaDespuesDe);
         }
 
         $total = (clone $query)->count('id');

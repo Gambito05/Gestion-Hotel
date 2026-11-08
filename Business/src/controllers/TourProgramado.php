@@ -9,8 +9,12 @@ use App\Services\DataService;
 use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\RequestException;
 use App\Validators\TourProgramadoValidator;
+use App\Validators\ReglaNegocioException;
 
 class TourProgramado {
+
+    #Si cambia alguno de estos campos se vuelven a revisar las reglas de negocio
+    private const CAMPOS_CON_REGLAS = ['tour_id', 'guia_id', 'fecha_hora_inicio', 'cupo'];
 
     public function __construct(private ContainerInterface $container){}
 
@@ -48,6 +52,8 @@ class TourProgramado {
             #Se envían siempre todas las llaves para que la capa de datos no reciba parámetros indefinidos
             $query = [
                 'tour_id' => trim((string) ($params['tour_id'] ?? '')),
+                'tour' => trim((string) ($params['tour'] ?? '')),
+                'guia_id' => trim((string) ($params['guia_id'] ?? '')),
                 'estado' => trim((string) ($params['estado'] ?? '')),
                 'fecha' => trim((string) ($params['fecha'] ?? ''))
             ];
@@ -86,10 +92,17 @@ class TourProgramado {
             }
 
             $dataservice = $this->container->get(DataService::class);
+
+            #Reglas de negocio: tour activo, cupo dentro del máximo, guía activo y fecha futura
+            (new TourProgramadoValidator())->aplicarReglas($dataservice, $data);
+
             $upstream = $dataservice->post('tours-programados', json_encode($data, JSON_THROW_ON_ERROR));
 
             return $this->json($response, json_decode((string) $upstream->getBody(), true), $upstream->getStatusCode());
-        }catch (ConnectException){
+        }catch (ReglaNegocioException $e){
+            return $this->json($response, ['error' => $e->getMessage()], $e->getStatus());
+        }
+        catch (ConnectException){
             return $this->json($response, ['error' => 'El servicio de datos no está disponible'], 502);
         }
         catch (RequestException){
@@ -99,13 +112,42 @@ class TourProgramado {
 
     public function update(Request $request, Response $response, array $args): Response {
         try {
-            $dataservice = $this->container->get(DataService::class);
+            $request->getBody()->rewind();
             $body = (string) $request->getBody();
-            $upstream = $dataservice->put('tours-programados/' . rawurlencode($args['id']), $body);
+
+            $data = json_decode($body, true);
+
+            if (!is_array($data) || json_last_error() !== JSON_ERROR_NONE) {
+                return $this->json($response, ['errors' => ['body' => 'Debe enviar un objeto JSON válido']], 400);
+            }
+
+            #Validación parcial: solo se revisan los campos que vienen en la petición
+            $errors = (new TourProgramadoValidator())->validate($data, true);
+            if ($errors !== []) {
+                return $this->json($response, ['errors' => $errors], 400);
+            }
+
+            $dataservice = $this->container->get(DataService::class);
+
+            if (array_intersect(self::CAMPOS_CON_REGLAS, array_keys($data)) !== []) {
+                $anterior = $dataservice->obtener('tours-programados/' . rawurlencode($args['id']));
+                if ($anterior === null) {
+                    return $this->json($response, ['error' => 'Tour programado no encontrado.'], 404);
+                }
+                $anterior = $anterior['data'];
+
+                #Se revisan las reglas con el registro completo: lo que había más los cambios
+                (new TourProgramadoValidator())->aplicarReglas($dataservice, array_merge($anterior, $data), $anterior);
+            }
+
+            $upstream = $dataservice->put('tours-programados/' . rawurlencode($args['id']), json_encode($data, JSON_THROW_ON_ERROR));
 
             return $this->json($response, json_decode((string) $upstream->getBody(), true), $upstream->getStatusCode());
 
-        }catch (ConnectException){
+        }catch (ReglaNegocioException $e){
+            return $this->json($response, ['error' => $e->getMessage()], $e->getStatus());
+        }
+        catch (ConnectException){
             return $this->json($response, ['error' => 'El servicio de datos no está disponible'], 502);
         }
         catch (RequestException){

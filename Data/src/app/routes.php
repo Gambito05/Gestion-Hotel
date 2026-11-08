@@ -101,11 +101,13 @@ $app->group('/api', function (RouteCollectorProxy $api) {
         $endpoint->get('', ServicioIncluido::class . ':read');
         $endpoint->get('/filter/{offset}/{limit}', ServicioIncluido::class . ':filter');
         $endpoint->post('', ServicioIncluido::class . ':create');
+        $endpoint->delete('/{tipo_habitacion_id}/{servicio_habitacion_id}', ServicioIncluido::class . ':delete');
     });
     $api->group('/idiomas-guia', function (RouteCollectorProxy $endpoint) {
         $endpoint->get('', IdiomaGuia::class . ':read');
         $endpoint->get('/filter/{offset}/{limit}', IdiomaGuia::class . ':filter');
         $endpoint->post('', IdiomaGuia::class . ':create');
+        $endpoint->delete('/{guia_id}/{idioma_id}', IdiomaGuia::class . ':delete');
     });
 
 });

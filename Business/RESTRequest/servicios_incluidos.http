@@ -53,4 +53,16 @@ Authorization: Bearer {{token}}
     "servicio_habitacion_id": 3
 }
 
+### Filtrar primera página de 10
+GET {{uri}}/filter/0/10?tipo_habitacion_id=1
+Authorization: Bearer {{token}}
+
+### Quitar la relación (tipo_habitacion_id=1, servicio_habitacion_id=1)
+DELETE {{uri}}/1/1
+Authorization: Bearer {{token}}
+
+### Quitar una relación que no existe (404)
+DELETE {{uri}}/1/9999
+Authorization: Bearer {{token}}
+
 ###

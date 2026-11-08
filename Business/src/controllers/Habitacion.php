@@ -49,7 +49,9 @@ class Habitacion {
             $query = [
                 'numero' => trim((string) ($params['numero'] ?? '')),
                 'estado' => trim((string) ($params['estado'] ?? '')),
-                'tipo_habitacion_id' => trim((string) ($params['tipo_habitacion_id'] ?? ''))
+                'tipo_habitacion_id' => trim((string) ($params['tipo_habitacion_id'] ?? '')),
+                'tipo' => trim((string) ($params['tipo'] ?? '')),
+                'piso' => trim((string) ($params['piso'] ?? ''))
             ];
 
             $dataservice = $this->container->get(DataService::class);
@@ -99,9 +101,23 @@ class Habitacion {
 
     public function update(Request $request, Response $response, array $args): Response {
         try {
-            $dataservice = $this->container->get(DataService::class);
+            $request->getBody()->rewind();
             $body = (string) $request->getBody();
-            $upstream = $dataservice->put('habitaciones/' . rawurlencode($args['id']), $body);
+
+            $data = json_decode($body, true);
+
+            if (!is_array($data) || json_last_error() !== JSON_ERROR_NONE) {
+                return $this->json($response, ['errors' => ['body' => 'Debe enviar un objeto JSON válido']], 400);
+            }
+
+            #Validación parcial: solo se revisan los campos que vienen en la petición
+            $errors = (new HabitacionValidator())->validate($data, true);
+            if ($errors !== []) {
+                return $this->json($response, ['errors' => $errors], 400);
+            }
+
+            $dataservice = $this->container->get(DataService::class);
+            $upstream = $dataservice->put('habitaciones/' . rawurlencode($args['id']), json_encode($data, JSON_THROW_ON_ERROR));
 
             return $this->json($response, json_decode((string) $upstream->getBody(), true), $upstream->getStatusCode());
 

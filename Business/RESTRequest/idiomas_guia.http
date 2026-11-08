@@ -43,4 +43,16 @@ Authorization: Bearer {{token}}
     "idioma_id": 9999
 }
 
+### Filtrar primera página de 10
+GET {{uri}}/filter/0/10?guia_id=1
+Authorization: Bearer {{token}}
+
+### Quitar la relación (guia_id=1, idioma_id=1)
+DELETE {{uri}}/1/1
+Authorization: Bearer {{token}}
+
+### Quitar una relación que no existe (404)
+DELETE {{uri}}/1/9999
+Authorization: Bearer {{token}}
+
 ###

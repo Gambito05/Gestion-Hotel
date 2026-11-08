@@ -124,6 +124,28 @@ class ServicioIncluido {
     }
  
  
+    public function delete(Request $request, Response $response, array $args): Response {
+        $tipoHabitacionId = filter_var($args['tipo_habitacion_id'] ?? '', FILTER_VALIDATE_INT);
+        $servicioHabitacionId = filter_var($args['servicio_habitacion_id'] ?? '', FILTER_VALIDATE_INT);
+
+        if ($tipoHabitacionId === false || $tipoHabitacionId < 1 || $servicioHabitacionId === false || $servicioHabitacionId < 1) {
+            return $this->json($response, ['error' => 'Los ids deben ser números enteros válidos.'], 422);
+        }
+
+        $this->container->get('eloquent');
+        #La llave primaria es compuesta, por eso se borra con una consulta y no con find()
+        $eliminados = ServicioIncluidoModel::query()
+            ->where('tipo_habitacion_id', $tipoHabitacionId)
+            ->where('servicio_habitacion_id', $servicioHabitacionId)
+            ->delete();
+
+        if ($eliminados === 0) {
+            return $this->json($response, ['error' => 'El servicio no está incluido en ese tipo de habitación.'], 404);
+        }
+
+        return $this->json($response, ['message' => 'Servicio quitado del tipo de habitación correctamente.'], 200);
+    }
+
     private function json(Response $response, array $payload, int $status): Response{
     $response->getBody()->write(json_encode($payload,
         JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR));

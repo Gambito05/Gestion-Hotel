@@ -47,7 +47,9 @@ class Guia {
 
             #Se envían siempre todas las llaves para que la capa de datos no reciba parámetros indefinidos
             $query = [
-                'nombre' => trim((string) ($params['nombre'] ?? ''))
+                'nombre' => trim((string) ($params['nombre'] ?? '')),
+                'telefono' => trim((string) ($params['telefono'] ?? '')),
+                'activo' => trim((string) ($params['activo'] ?? ''))
             ];
 
             $dataservice = $this->container->get(DataService::class);
@@ -97,9 +99,23 @@ class Guia {
 
     public function update(Request $request, Response $response, array $args): Response {
         try {
-            $dataservice = $this->container->get(DataService::class);
+            $request->getBody()->rewind();
             $body = (string) $request->getBody();
-            $upstream = $dataservice->put('guias/' . rawurlencode($args['id']), $body);
+
+            $data = json_decode($body, true);
+
+            if (!is_array($data) || json_last_error() !== JSON_ERROR_NONE) {
+                return $this->json($response, ['errors' => ['body' => 'Debe enviar un objeto JSON válido']], 400);
+            }
+
+            #Validación parcial: solo se revisan los campos que vienen en la petición
+            $errors = (new GuiaValidator())->validate($data, true);
+            if ($errors !== []) {
+                return $this->json($response, ['errors' => $errors], 400);
+            }
+
+            $dataservice = $this->container->get(DataService::class);
+            $upstream = $dataservice->put('guias/' . rawurlencode($args['id']), json_encode($data, JSON_THROW_ON_ERROR));
 
             return $this->json($response, json_decode((string) $upstream->getBody(), true), $upstream->getStatusCode());
 

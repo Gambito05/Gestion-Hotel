@@ -202,4 +202,27 @@ Authorization: ******
     "username": "Laura"
 }
 
+### ===== Control por rol =====
+### Con token de recepcionista: registrar un administrador (403)
+POST {{uri}}
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "rol_id": 1,
+    "nombre": "Ana",
+    "apellidos": "Mora Solís",
+    "email": "ana@hotel.com",
+    "password": "Clave123*"
+}
+
+### Actualizar con un email inválido (400, validación parcial)
+PUT {{uri}}/3
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "email": "no-es-un-email"
+}
+
 ###
